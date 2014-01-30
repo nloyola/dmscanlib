@@ -91,15 +91,14 @@ void DmScanLib::configLogging(unsigned level, bool useFile) {
     loggingInitialized = true;
 }
 
-int DmScanLib::scanImage(
-        const unsigned dpi,
-        const int brightness,
-        const int contrast,
-            const float x,
-            const float y,
-            const float width,
-            const float height,
-        const char * filename) {
+int DmScanLib::scanImage(const unsigned dpi,
+                         const int brightness,
+                         const int contrast,
+                         const float x,
+                         const float y,
+                         const float width,
+                         const float height,
+                         const char * filename) {
     if (filename == NULL) {
         throw std::invalid_argument("filename is null");
     }
@@ -111,14 +110,8 @@ int DmScanLib::scanImage(
             << " contrast/" << contrast << region
             << " filename/" << filename;
 
-    HANDLE h = imgScanner->acquireImage(dpi, brightness, contrast, region);
-    if (h == NULL) {
-        VLOG(1) << "could not acquire image";
-        return imgScanner->getErrorCode();
-    }
-    Image image(h);
-    image.write(filename);
-    imgScanner->freeImage(h);
+    std::unique_ptr<Image> image = imgScanner->acquireImage(dpi, brightness, contrast, region);
+    image->write(filename);
     return SC_SUCCESS;
 }
 
@@ -131,26 +124,19 @@ int DmScanLib::scanFlatbed(unsigned dpi, int brightness, int contrast,
     VLOG(1) << "scanFlatbed: dpi/" << dpi << " brightness/" << brightness
                       << " contrast/" << contrast << " filename/" << filename;
 
-    HANDLE h = imgScanner->acquireFlatbed(dpi, brightness, contrast);
-    if (h == NULL) {
-        VLOG(1) << "could not acquire image";
-        return imgScanner->getErrorCode();
-    }
-    Image image(h);
-    image.write(filename);
-    imgScanner->freeImage(h);
+    std::unique_ptr<Image> image = imgScanner->acquireFlatbed(dpi, brightness, contrast);
+    image->write(filename);
     return SC_SUCCESS;
 }
 
-int DmScanLib::scanAndDecode(
-        const unsigned dpi,
-        const int brightness,
-        const int contrast,
-            const float x,
-            const float y,
-            const float width,
-            const float height,
-        const DecodeOptions & decodeOptions,
+int DmScanLib::scanAndDecode(const unsigned dpi,
+                             const int brightness,
+                             const int contrast,
+                             const float x,
+                             const float y,
+                             const float width,
+                             const float height,
+                             const DecodeOptions & decodeOptions,
         std::vector<std::unique_ptr<const WellRectangle> > & wellRects) {
 
     cv::Rect_<float> region(x, y, width, height);
@@ -160,28 +146,19 @@ int DmScanLib::scanAndDecode(
             << " contrast/" << contrast
             << " " << region << " " << decodeOptions;
 
-    HANDLE h;
     int result;
 
-    h = imgScanner->acquireImage(dpi, brightness, contrast, region);
-    if (h == NULL) {
-        VLOG(1) << "could not acquire image";
-        return imgScanner->getErrorCode();
-    }
+    std::unique_ptr<Image> image = imgScanner->acquireImage(dpi, brightness, contrast, region);
+    image->write("scanned.png");
+    result = decodeCommon(*image, decodeOptions, "decode.png", wellRects);
 
-    Image image(h);
-    image.write("scanned.png");
-    result = decodeCommon(image, decodeOptions, "decode.png", wellRects);
-
-    imgScanner->freeImage(h);
     VLOG(1) << "decodeCommon returned: " << result;
     return result;
 }
 
-int DmScanLib::decodeImageWells(
-        const char * filename,
-        const DecodeOptions & decodeOptions,
-        std::vector<std::unique_ptr<const WellRectangle> > & wellRects) {
+int DmScanLib::decodeImageWells(const char * filename,
+                                const DecodeOptions & decodeOptions,
+                                std::vector<std::unique_ptr<const WellRectangle> > & wellRects) {
 
     VLOG(1) << "decodeImageWells: filename/" << filename
             << " numWellRects/" << wellRects.size()
@@ -196,9 +173,9 @@ int DmScanLib::decodeImageWells(
 }
 
 int DmScanLib::decodeCommon(const Image & image,
-        const DecodeOptions & decodeOptions,
-        const std::string &decodedDibFilename,
-        std::vector<std::unique_ptr<const WellRectangle> > & wellRects) {
+                            const DecodeOptions & decodeOptions,
+                            const std::string &decodedDibFilename,
+                            std::vector<std::unique_ptr<const WellRectangle> > & wellRects) {
 
     decoder = std::unique_ptr<Decoder>(new Decoder(image, decodeOptions, wellRects));
     int result = decoder->decodeWellRects();
@@ -218,9 +195,8 @@ int DmScanLib::decodeCommon(const Image & image,
     return SC_SUCCESS;
 }
 
-void DmScanLib::writeDecodedImage(
-        const Image & image,
-        const std::string & decodedDibFilename) {
+void DmScanLib::writeDecodedImage(const Image & image,
+                                  const std::string & decodedDibFilename) {
 
     CHECK_NOTNULL(decoder.get());
 

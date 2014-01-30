@@ -111,13 +111,12 @@ bool getTestImageInfoFilenames(std::string dir, std::vector<std::string> & filen
     return true;
 }
 
-void getWellRectsForBoundingBox(
-        const cv::Rect & bbox,
-        const unsigned rows,
-        const unsigned cols,
-        Orientation orientation,
-        BarcodePosition position,
-        std::vector<std::unique_ptr<const WellRectangle> > & wellRects) {
+void getWellRectsForBoundingBox(const cv::Rect & bbox,
+                                const unsigned rows,
+                                const unsigned cols,
+                                Orientation orientation,
+                                BarcodePosition position,
+                                std::vector<std::unique_ptr<const WellRectangle> > & wellRects) {
 
     float wellWidth = bbox.width / static_cast<float>(cols);
     float wellHeight = bbox.height / static_cast<float>(rows);
@@ -127,7 +126,7 @@ void getWellRectsForBoundingBox(
 
     // round off the cell size so image dimensions are not exceeded
     cv::Size cellSize(
-		static_cast<unsigned>(0.999f * wellWidth), 
+		static_cast<unsigned>(0.999f * wellWidth),
 		static_cast<unsigned>(0.999f * wellHeight));
 
     float horOffset;

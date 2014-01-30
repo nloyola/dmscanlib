@@ -48,12 +48,12 @@ DSMENTRYPROC ImgScannerTwain::twainDsmEntry = NULL;
 
 // Initialize g_AppID. This structure is passed to DSM_Entry() in each
 // function call.
-TW_IDENTITY ImgScannerTwain::twainAppID = { 
-	0, 
-	{ 1, 0, TWLG_ENGLISH_USA, TWCY_USA, "dmscanlib 1.0" }, 
-	TWON_PROTOCOLMAJOR, TWON_PROTOCOLMINOR, DG_CONTROL | DG_IMAGE, 
+TW_IDENTITY ImgScannerTwain::twainAppID = {
+	0,
+	{ 1, 0, TWLG_ENGLISH_USA, TWCY_USA, "dmscanlib 1.0" },
+	TWON_PROTOCOLMAJOR, TWON_PROTOCOLMINOR, DG_CONTROL | DG_IMAGE,
 	"Canadian Biosample Repository",
-	"Image acquisition library", "dmscanlib", 
+	"Image acquisition library", "dmscanlib",
 };
 
 ImgScannerTwain::ImgScannerTwain() {
@@ -63,15 +63,15 @@ ImgScannerTwain::~ImgScannerTwain() {
 }
 
 void ImgScannerTwain::setTwainDsmEntry(DSMENTRYPROC twainDsmEntry) {
-	ImgScannerTwain::twainDsmEntry = twainDsmEntry;
-	VLOG(1) << "ImgScannerTwain::setTwainDsmEntry";
+   ImgScannerTwain::twainDsmEntry = twainDsmEntry;
+   VLOG(1) << "ImgScannerTwain::setTwainDsmEntry";
 }
 
 unsigned ImgScannerTwain::invokeTwain(
-	TW_IDENTITY * srcId, 
+	TW_IDENTITY * srcId,
 	unsigned long dg,
-	unsigned dat, 
-	unsigned msg, 
+	unsigned dat,
+	unsigned msg,
 	void * ptr) {
 
    CHECK_NOTNULL(twainDsmEntry);
@@ -198,12 +198,10 @@ void ImgScannerTwain::setFloatToIntPair(const double f, short & whole,
  *
  *	Grab an image from the twain source and convert it to the dmtxImage format
  */
-HANDLE ImgScannerTwain::acquireImage(
-        const unsigned dpi,
-        const int brightness,
-        const int contrast,
-        const cv::Rect_<float> & bbox) {
-
+std::unique_ptr<Image> ImgScannerTwain::acquireImage(const unsigned dpi,
+                                                     const int brightness,
+                                                     const int contrast,
+                                                     const cv::Rect_<float> & bbox) {
    TW_UINT16 rc;
    TW_UINT32 handle = 0;
    TW_IDENTITY srcID;
@@ -214,35 +212,31 @@ HANDLE ImgScannerTwain::acquireImage(
 
    if (!scannerSourceInit(hwnd, srcID)) {
       errorCode = SC_FAIL;
-      return NULL;
+      return std::unique_ptr<Image>{};
    }
 
    int scannerCapability = getScannerCapabilityInternal(srcID);
 
    if (!(scannerCapability & CAP_IS_SCANNER)) {
-	  scannerSourceDeinit(hwnd, srcID);
+      scannerSourceDeinit(hwnd, srcID);
       errorCode = SC_FAIL;
-      return NULL;
+      return std::unique_ptr<Image>{};
    }
-
    if (!(((scannerCapability & CAP_DPI_300) && dpi == 300)
          || ((scannerCapability & CAP_DPI_400) && dpi == 400)
          || ((scannerCapability & CAP_DPI_600) && dpi == 600))) {
 	  scannerSourceDeinit(hwnd, srcID);
       errorCode = SC_INVALID_DPI;
-      return NULL;
+      return std::unique_ptr<Image>{};
    }
 
    double physicalWidth = getPhysicalDimensions(srcID, ICAP_PHYSICALWIDTH);
    double physicalHeight = getPhysicalDimensions(srcID, ICAP_PHYSICALHEIGHT);
 
-   cv::Rect_<float> flatbedRect(0, 0, 
-	   static_cast<float>(physicalWidth),
-	   static_cast<float>(physicalHeight));
-
-   if (!flatbedRect.contains(bbox.tl()) && !flatbedRect.contains(bbox.br()))  {
-		   throw std::invalid_argument("bounding box exeeds image dimensions");
-   }
+   CHECK_GE(bbox.x, 0) << "bounding box exeeds flatbed dimensions";
+   CHECK_GE(bbox.y, 0) << "bounding box exeeds flatbed dimensions";
+   CHECK_LE(bbox.width, physicalWidth) << "bounding box exeeds flatbed dimensions";
+   CHECK_LE(bbox.height, physicalHeight) << "bounding box exeeds flatbed dimensions";
 
    errorCode = SC_SUCCESS;
 
@@ -294,7 +288,7 @@ HANDLE ImgScannerTwain::acquireImage(
       errorCode = SC_FAIL;
       scannerSourceDeinit(hwnd, srcID);
       VLOG(3) << "TWRC_FAILURE";
-      return NULL;
+      return std::unique_ptr<Image>{};
    }
 
    MSG msg;
@@ -314,8 +308,7 @@ HANDLE ImgScannerTwain::acquireImage(
       }
 
       if (event.TWMessage == MSG_CLOSEDSREQ) {
-         rc = invokeTwain(&srcID, DG_CONTROL, DAT_USERINTERFACE,
-                          MSG_DISABLEDS, &ui);
+         rc = invokeTwain(&srcID, DG_CONTROL, DAT_USERINTERFACE, MSG_DISABLEDS, &ui);
          VLOG(3) << "got MSG_CLOSEDSREQ: sending DG_CONTROL / DAT_USERINTERFACE / MSG_DISABLEDS";
          break;
       }
@@ -327,8 +320,7 @@ HANDLE ImgScannerTwain::acquireImage(
          VLOG(3) << "DG_IMAGE / DAT_IMAGEINFO / MSG_GET";
 
          if (rc == TWRC_FAILURE) {
-            invokeTwain(&srcID, DG_CONTROL, DAT_PENDINGXFERS, MSG_RESET,
-                        &pxfers);
+            invokeTwain(&srcID, DG_CONTROL, DAT_PENDINGXFERS, MSG_RESET, &pxfers);
             VLOG(3) << "DG_CONTROL / DAT_PENDINGXFERS / MSG_RESET";
             LOG(WARNING) << "Unable to obtain image information";
             break;
@@ -336,10 +328,10 @@ HANDLE ImgScannerTwain::acquireImage(
 
          // If image is compressed or is not 8-bit color and not 24-bit
          // color ...
-         if ((rc != TWRC_CANCEL) && ((ii.Compression != TWCP_NONE)
-                                     || ((ii.BitsPerPixel != 8) && (ii.BitsPerPixel != 24)))) {
-            invokeTwain(&srcID, DG_CONTROL, DAT_PENDINGXFERS, MSG_RESET,
-                        &pxfers);
+         if ((rc != TWRC_CANCEL)
+             && ((ii.Compression != TWCP_NONE)
+                 || ((ii.BitsPerPixel != 8) && (ii.BitsPerPixel != 24)))) {
+            invokeTwain(&srcID, DG_CONTROL, DAT_PENDINGXFERS, MSG_RESET, &pxfers);
             LOG(WARNING) << "Image compressed or not 8-bit/24-bit ";
             break;
          }
@@ -356,14 +348,12 @@ HANDLE ImgScannerTwain::acquireImage(
                  << " pixelType/" << ii.PixelType;
 
          // Perform the transfer.
-         rc = invokeTwain(&srcID, DG_IMAGE, DAT_IMAGENATIVEXFER, MSG_GET,
-                          &handle);
+         rc = invokeTwain(&srcID, DG_IMAGE, DAT_IMAGENATIVEXFER, MSG_GET, &handle);
          VLOG(3) << "DG_IMAGE / DAT_IMAGENATIVEXFER / MSG_GET";
 
          // If image not successfully transferred ...
          if (rc != TWRC_XFERDONE) {
-            invokeTwain(&srcID, DG_CONTROL, DAT_PENDINGXFERS, MSG_RESET,
-                        &pxfers);
+            invokeTwain(&srcID, DG_CONTROL, DAT_PENDINGXFERS, MSG_RESET, &pxfers);
             VLOG(3) << "DG_CONTROL / DAT_PENDINGXFERS / MSG_RESET";
             LOG(WARNING) << "User aborted transfer or failure";
             errorCode = SC_INVALID_IMAGE;
@@ -372,19 +362,16 @@ HANDLE ImgScannerTwain::acquireImage(
          }
 
          // acknowledge end of transfer.
-         rc = invokeTwain(&srcID, DG_CONTROL, DAT_PENDINGXFERS, MSG_ENDXFER,
-                          &pxfers);
+         rc = invokeTwain(&srcID, DG_CONTROL, DAT_PENDINGXFERS, MSG_ENDXFER, &pxfers);
          VLOG(3) << "DG_CONTROL / DAT_PENDINGXFERS / MSG_ENDXFER";
 
          if (rc == TWRC_SUCCESS) {
             if (pxfers.Count != 0) {
                // Cancel all remaining transfers.
-               invokeTwain(&srcID, DG_CONTROL, DAT_PENDINGXFERS,
-                           MSG_RESET, &pxfers);
+               invokeTwain(&srcID, DG_CONTROL, DAT_PENDINGXFERS, MSG_RESET, &pxfers);
                VLOG(3) << "DG_CONTROL / DAT_PENDINGXFERS / MSG_RESET";
             } else {
-               rc = invokeTwain(&srcID, DG_CONTROL, DAT_USERINTERFACE,
-                                MSG_DISABLEDS, &ui);
+               rc = invokeTwain(&srcID, DG_CONTROL, DAT_USERINTERFACE, MSG_DISABLEDS, &ui);
                VLOG(3) << "DG_CONTROL / DAT_USERINTERFACE / MSG_DISABLEDS";
                break;
             }
@@ -392,13 +379,13 @@ HANDLE ImgScannerTwain::acquireImage(
       }
    }
 
-   VLOG(2) << "image acquired successfully"; 
+   VLOG(2) << "image acquired successfully";
 
    scannerSourceDeinit(hwnd, srcID);
-   return (HANDLE) handle;
+   return std::unique_ptr<Image>(new Image(handle));
 }
 
-HANDLE ImgScannerTwain::acquireFlatbed(unsigned dpi, int brightness, int contrast) {
+std::unique_ptr<Image> ImgScannerTwain::acquireFlatbed(unsigned dpi, int brightness, int contrast) {
    TW_IDENTITY srcID;
    HWND hwnd;
 
@@ -412,14 +399,14 @@ HANDLE ImgScannerTwain::acquireFlatbed(unsigned dpi, int brightness, int contras
    double physicalHeight = getPhysicalDimensions(srcID, ICAP_PHYSICALHEIGHT);
 
    scannerSourceDeinit(hwnd, srcID);
-   cv::Rect_<float> scanRect(0, 0, 
+   cv::Rect_<float> scanRect(0, 0,
 	   static_cast<float>(physicalWidth),
 	   static_cast<float>(physicalHeight));
    return acquireImage(dpi, brightness, contrast, scanRect);
 }
 
 BOOL ImgScannerTwain::setCapOneValue(TW_IDENTITY * srcId, unsigned Cap,
-                                    unsigned ItemType, unsigned long ItemVal) {
+                                     unsigned ItemType, unsigned long ItemVal) {
    BOOL ret_value = FALSE;
    TW_CAPABILITY cap;
    pTW_ONEVALUE pv;
@@ -682,21 +669,7 @@ inline double ImgScannerTwain::uint32ToFloat(TW_UINT32 uint32) {
 }
 
 inline double ImgScannerTwain::twfix32ToFloat(TW_FIX32 fix32) {
-   return static_cast<float> (fix32.Whole) + static_cast<float> (fix32.Frac)
-      / 65536.0;
-}
-
-/*
- *	freeHandle()
- *	@params - none
- *	@return - none
- *
- *	Unlock the handle to the image from twain, and free the memory.
- */
-void ImgScannerTwain::freeImage(HANDLE handle) {
-   CHECK_NOTNULL(handle);
-   GlobalUnlock(handle);
-   GlobalFree(handle);
+   return static_cast<float> (fix32.Whole) + static_cast<float> (fix32.Frac) / 65536.0;
 }
 
 } /* namespace */

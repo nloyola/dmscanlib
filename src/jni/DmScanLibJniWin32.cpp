@@ -17,35 +17,35 @@ namespace dmscanlib {
 namespace jni {
 
 void getResultCodeMsg(int resultCode, std::string & message) {
-	switch (resultCode) {
-	case SC_SUCCESS:
-		message = "";
-		break;
-	case SC_FAIL:
-		message = "operation failed";
-		break;
-	case SC_TWAIN_UNAVAIL:
-		message = "twain driver unavailable";
-		break;
-	case SC_INVALID_DPI:
-		message = "invalid DPI specified";
-		break;
-    case SC_INVALID_NOTHING_DECODED:
-        message = "no datamatrix barcodes could be decoded from the image";
-		break;
-	case SC_INVALID_IMAGE:
-		message = "invalid image scanned";
-		break;
-    case SC_INVALID_NOTHING_TO_DECODE:
-        message = "no wells to decode";
-		break;
-	case SC_INCORRECT_DPI_SCANNED:
-		message = "incorrect DPI on scanned image";
-		break;
-	default:
-		message = "undefined error";
-		break;
-	}
+   switch (resultCode) {
+      case SC_SUCCESS:
+         message = "";
+         break;
+      case SC_FAIL:
+         message = "operation failed";
+         break;
+      case SC_TWAIN_UNAVAIL:
+         message = "twain driver unavailable";
+         break;
+      case SC_INVALID_DPI:
+         message = "invalid DPI specified";
+         break;
+      case SC_INVALID_NOTHING_DECODED:
+         message = "no datamatrix barcodes could be decoded from the image";
+         break;
+      case SC_INVALID_IMAGE:
+         message = "invalid image scanned";
+         break;
+      case SC_INVALID_NOTHING_TO_DECODE:
+         message = "no wells to decode";
+         break;
+      case SC_INCORRECT_DPI_SCANNED:
+         message = "incorrect DPI on scanned image";
+         break;
+      default:
+         message = "undefined error";
+         break;
+   }
 }
 
 } /* namespace */
@@ -53,139 +53,148 @@ void getResultCodeMsg(int resultCode, std::string & message) {
 } /* namespace */
 
 JNIEXPORT jobject JNICALL Java_org_biobank_platedecoder_dmscanlib_ScanLib_selectSourceAsDefault(
-                JNIEnv * env, jobject obj) {
-    dmscanlib::DmScanLib dmScanLib;
-    int result = dmScanLib.selectSourceAsDefault();
-    return dmscanlib::jni::createScanResultObject(env, result, result);
+   JNIEnv * env, jobject obj) {
+   dmscanlib::DmScanLib dmScanLib;
+   int result = dmScanLib.selectSourceAsDefault();
+   return dmscanlib::jni::createScanResultObject(env, result, result);
 }
 
 JNIEXPORT jobject JNICALL Java_org_biobank_platedecoder_dmscanlib_ScanLib_getScannerCapability(
-        JNIEnv * env,
-        jobject obj) {
-    dmscanlib::DmScanLib dmScanLib;
-    int result = dmScanLib.getScannerCapability();
-    return dmscanlib::jni::createScanResultObject(env, dmscanlib::SC_SUCCESS, result);
+   JNIEnv * env,
+   jobject obj) {
+   dmscanlib::DmScanLib dmScanLib;
+   int result = dmScanLib.getScannerCapability();
+   return dmscanlib::jni::createScanResultObject(env, dmscanlib::SC_SUCCESS, result);
 }
 
+/**
+ *
+ *
+ * @param x The left margin in inches.
+ *
+ * @param y The top margin in inches.
+ *
+ * @param width The width in inches.
+ *
+ * @param height The height in inches.
+ */
 JNIEXPORT jobject JNICALL Java_org_biobank_platedecoder_dmscanlib_ScanLib_scanImage(
-                JNIEnv * env,
-				jobject obj,
-				jlong _verbose,
-				jlong _dpi,
-                jint _brightness,
-				jint _contrast,
-				jdouble x,
-				jdouble y,
-				jdouble width,
-				jdouble height,
-                jstring _filename) {
+   JNIEnv * env,
+   jobject obj,
+   jlong _verbose,
+   jlong _dpi,
+   jint _brightness,
+   jint _contrast,
+   jdouble x,
+   jdouble y,
+   jdouble width,
+   jdouble height,
+   jstring _filename) {
 
-    if ((_dpi == 0)	|| (_filename == 0)) {
-		return dmscanlib::jni::createDecodeResultObject(env, dmscanlib::SC_FAIL);
-	}
+   if ((_dpi == 0)	|| (_filename == 0)) {
+      return dmscanlib::jni::createDecodeResultObject(env, dmscanlib::SC_FAIL);
+   }
 
-    unsigned verbose = static_cast<unsigned>(_verbose);
-    unsigned dpi = static_cast<unsigned>(_dpi);
-    unsigned brightness = static_cast<unsigned>(_brightness);
-    unsigned contrast = static_cast<unsigned>(_contrast);
-    const char *filename = env->GetStringUTFChars(_filename, 0);
+   unsigned verbose = static_cast<unsigned>(_verbose);
+   unsigned dpi = static_cast<unsigned>(_dpi);
+   unsigned brightness = static_cast<unsigned>(_brightness);
+   unsigned contrast = static_cast<unsigned>(_contrast);
+   const char *filename = env->GetStringUTFChars(_filename, 0);
 
-    dmscanlib::DmScanLib dmScanLib(verbose);
-    int result = dmScanLib.scanImage(
-		dpi,
-		brightness,
-		contrast,
-		static_cast<float>(x),
-		static_cast<float>(y),
-		static_cast<float>(width),
-		static_cast<float>(height),
-		filename);
-    jobject resultObj = dmscanlib::jni::createScanResultObject(env, result, result);
-    env->ReleaseStringUTFChars(_filename, filename);
-    return resultObj;
+   dmscanlib::DmScanLib dmScanLib(verbose);
+   int result = dmScanLib.scanImage(
+      dpi,
+      brightness,
+      contrast,
+      static_cast<float>(x),
+      static_cast<float>(y),
+      static_cast<float>(width),
+      static_cast<float>(height),
+      filename);
+   jobject resultObj = dmscanlib::jni::createScanResultObject(env, result, result);
+   env->ReleaseStringUTFChars(_filename, filename);
+   return resultObj;
 }
 
 JNIEXPORT jobject JNICALL Java_org_biobank_platedecoder_dmscanlib_ScanLib_scanFlatbed(
-                JNIEnv * env,
-				jobject obj,
-				jlong _verbose,
-				jlong _dpi,
-                jint _brightness,
-				jint _contrast,
-				jstring _filename) {
+   JNIEnv * env,
+   jobject obj,
+   jlong _verbose,
+   jlong _dpi,
+   jint _brightness,
+   jint _contrast,
+   jstring _filename) {
 
-    if ((_dpi == 0)	|| (_filename == 0)) {
-		return dmscanlib::jni::createDecodeResultObject(env, dmscanlib::SC_FAIL);
-	}
+   if ((_dpi == 0)	|| (_filename == 0)) {
+      return dmscanlib::jni::createDecodeResultObject(env, dmscanlib::SC_FAIL);
+   }
 
-    unsigned verbose = static_cast<unsigned>(_verbose);
-    unsigned dpi = static_cast<unsigned>(_dpi);
-    unsigned brightness = static_cast<unsigned>(_brightness);
-    unsigned contrast = static_cast<unsigned>(_contrast);
-    const char *filename = env->GetStringUTFChars(_filename, 0);
+   unsigned verbose = static_cast<unsigned>(_verbose);
+   unsigned dpi = static_cast<unsigned>(_dpi);
+   unsigned brightness = static_cast<unsigned>(_brightness);
+   unsigned contrast = static_cast<unsigned>(_contrast);
+   const char *filename = env->GetStringUTFChars(_filename, 0);
 
-    dmscanlib::DmScanLib dmScanLib(verbose);
-    int result = dmScanLib.scanFlatbed(dpi, brightness, contrast, filename);
-    jobject resultObj = dmscanlib::jni::createScanResultObject(env, result, result);
-    env->ReleaseStringUTFChars(_filename, filename);
-    return resultObj;
+   dmscanlib::DmScanLib dmScanLib(verbose);
+   int result = dmScanLib.scanFlatbed(dpi, brightness, contrast, filename);
+   jobject resultObj = dmscanlib::jni::createScanResultObject(env, result, result);
+   env->ReleaseStringUTFChars(_filename, filename);
+   return resultObj;
 }
 
 JNIEXPORT jobject JNICALL Java_org_biobank_platedecoder_dmscanlib_ScanLib_scanAndDecode(
-        JNIEnv * env,
-  jobject obj,
-  jlong _verbose,
-  jlong _dpi,
-  jint _brightness,
-  jint _contrast,
-  jdouble x,
-  jdouble y,
-  jdouble width,
-  jdouble height,
-  jobject _decodeOptions,
-  jobjectArray _wellRects) {
+   JNIEnv * env,
+   jobject obj,
+   jlong _verbose,
+   jlong _dpi,
+   jint _brightness,
+   jint _contrast,
+   jdouble x,
+   jdouble y,
+   jdouble width,
+   jdouble height,
+   jobject _decodeOptions,
+   jobjectArray _wellRects) {
 
-    if ((_dpi == 0)	|| (_decodeOptions == 0) || (_wellRects == 0)) {
-		return dmscanlib::jni::createDecodeResultObject(env, dmscanlib::SC_FAIL);
-	}
+   if ((_dpi == 0)	|| (_decodeOptions == 0) || (_wellRects == 0)) {
+      return dmscanlib::jni::createDecodeResultObject(env, dmscanlib::SC_FAIL);
+   }
 
-    dmscanlib::DmScanLib::configLogging(static_cast<unsigned>(_verbose), false);
+   dmscanlib::DmScanLib::configLogging(static_cast<unsigned>(_verbose), false);
 
-    unsigned dpi = static_cast<unsigned>(_dpi);
-    unsigned brightness = static_cast<unsigned>(_brightness);
-    unsigned contrast = static_cast<unsigned>(_contrast);
-    std::vector<std::unique_ptr<const dmscanlib::WellRectangle> > wellRects;
+   unsigned dpi = static_cast<unsigned>(_dpi);
+   unsigned brightness = static_cast<unsigned>(_brightness);
+   unsigned contrast = static_cast<unsigned>(_contrast);
+   std::vector<std::unique_ptr<const dmscanlib::WellRectangle> > wellRects;
 
-    std::unique_ptr<dmscanlib::DecodeOptions> decodeOptions =
-		dmscanlib::DecodeOptions::getDecodeOptionsViaJni(env, _decodeOptions);
+   std::unique_ptr<dmscanlib::DecodeOptions> decodeOptions =
+      dmscanlib::DecodeOptions::getDecodeOptionsViaJni(env, _decodeOptions);
 
-	jsize numWells = env->GetArrayLength(_wellRects);
-	int result = dmscanlib::jni::getWellRectangles(env, numWells, _wellRects, wellRects);
+   jsize numWells = env->GetArrayLength(_wellRects);
+   int result = dmscanlib::jni::getWellRectangles(env, numWells, _wellRects, wellRects);
 
-	if (result == 0) {
-		// got an exception when converting from JNI
-		return NULL;
-	} else if ((result != 1) || (wellRects.size() == 0)) {
-    	// invalid rects or zero rects passed from java
-    	return dmscanlib::jni::createDecodeResultObject(env, dmscanlib::SC_INVALID_NOTHING_TO_DECODE);
-	}
+   if (result == 0) {
+      // got an exception when converting from JNI
+      return NULL;
+   } else if ((result != 1) || (wellRects.size() == 0)) {
+      // invalid rects or zero rects passed from java
+      return dmscanlib::jni::createDecodeResultObject(env, dmscanlib::SC_INVALID_NOTHING_TO_DECODE);
+   }
 
-    dmscanlib::DmScanLib dmScanLib(0);
-    result = dmScanLib.scanAndDecode(
-		dpi,
-		brightness,
-		contrast,
-		static_cast<float>(x),
-		static_cast<float>(y),
-		static_cast<float>(width),
-		static_cast<float>(height),
-		*decodeOptions,
-		wellRects);
+   dmscanlib::DmScanLib dmScanLib(0);
+   result = dmScanLib.scanAndDecode(
+      dpi,
+      brightness,
+      contrast,
+      static_cast<float>(x),
+      static_cast<float>(y),
+      static_cast<float>(width),
+      static_cast<float>(height),
+      *decodeOptions,
+      wellRects);
 
-	if (result == dmscanlib::SC_SUCCESS) {
-		return dmscanlib::jni::createDecodeResultObject(env,result, dmScanLib.getDecodedWells());
-	}
-	return dmscanlib::jni::createDecodeResultObject(env, result);
+   if (result == dmscanlib::SC_SUCCESS) {
+      return dmscanlib::jni::createDecodeResultObject(env,result, dmScanLib.getDecodedWells());
+   }
+   return dmscanlib::jni::createDecodeResultObject(env, result);
 }
-
-

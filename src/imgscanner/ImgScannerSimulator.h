@@ -40,28 +40,26 @@ public:
 
     int getScannerCapability();
 
-    HANDLE acquireImage(
-            const unsigned dpi,
-            const int brightness,
-            const int contrast,
-            const cv::Rect_<float> & bbox);
+    std::unique_ptr<Image> acquireImage(const unsigned dpi,
+                                         const int brightness,
+                                         const int contrast,
+                                         const cv::Rect_<float> & bbox);
 
-    HANDLE acquireFlatbed(
-            const unsigned dpi,
-            const int brightness,
-            const int contrast);
+   std::unique_ptr<Image>  acquireFlatbed(const unsigned dpi,
+                                          const int brightness,
+                                          const int contrast);
 
-    void freeImage(HANDLE handle);
-
-    int getErrorCode() {
-        return 0;
-    }
-
-private:
+   int getErrorCode() {
+      return 0;
+   }
 };
 
 } /* namespace */
 
 } /* namespace */
+
+/* Local Variables: */
+/* mode: c++        */
+/* End:             */
 
 #endif /* __INCLUDE_IMG_SCANNER_SIMULATOR_H */

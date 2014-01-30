@@ -32,6 +32,8 @@ public:
     Image(const std::string & filename);
     Image(HANDLE handle);
     Image(const Image & that);
+    Image(const cv::Mat & mat);
+
     virtual ~Image();
 
     const bool isValid() const {
@@ -64,11 +66,13 @@ public:
 
     int write(const std::string & filename) const;
 
+    int getWidth() const;
+
+    int getHeight() const;
 
 private:
-    Image(const cv::Mat & mat);
-
     cv::Mat image;
+    HANDLE handle;
     bool valid;
     const std::string filename;
 };

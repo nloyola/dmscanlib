@@ -270,8 +270,8 @@ TEST(TestDmScanLib, decodeAllImages) {
             totalTubes += testResult->totalTubes;
             totalTime += testResult->decodeTime;
         }
-		testResults.push_back(ss.str());
-	}
+        testResults.push_back(ss.str());
+    }
 
     ss.str("");
     ss << "decoded:," << totalDecoded << ", total:," << totalTubes;

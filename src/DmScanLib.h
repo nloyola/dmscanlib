@@ -75,37 +75,33 @@ public:
 	* (x1, y1) is the top left corner
 	* (x2, y2) is the bottom right corner
 	*/
-    int scanImage(
-            const unsigned dpi,
-            const int brightness,
-            const int contrast,
-            const float x,
-            const float y,
-            const float width,
-            const float height,
-            const char * filename);
+    int scanImage(const unsigned dpi,
+                  const int brightness,
+                  const int contrast,
+                  const float x,
+                  const float y,
+                  const float width,
+                  const float height,
+                  const char * filename);
 
-    int scanFlatbed(
-            unsigned dpi,
-            int brightness,
-            int contrast,
-            const char * filename);
+    int scanFlatbed(unsigned dpi,
+                    int brightness,
+                    int contrast,
+                    const char * filename);
 
-    int scanAndDecode(
-            const unsigned dpi,
-            const int brightness,
-            const int contrast,
-            const float x,
-            const float y,
-            const float width,
-            const float height,
-            const DecodeOptions & decodeOptions,
-            std::vector<std::unique_ptr<const WellRectangle> > & wellRects);
+    int scanAndDecode(const unsigned dpi,
+                      const int brightness,
+                      const int contrast,
+                      const float x,
+                      const float y,
+                      const float width,
+                      const float height,
+                      const DecodeOptions & decodeOptions,
+                      std::vector<std::unique_ptr<const WellRectangle> > & wellRects);
 
-    int decodeImageWells(
-            const char * filename,
-            const DecodeOptions & decodeOptions,
-            std::vector<std::unique_ptr<const WellRectangle> > & wellRects);
+    int decodeImageWells(const char * filename,
+                         const DecodeOptions & decodeOptions,
+                         std::vector<std::unique_ptr<const WellRectangle> > & wellRects);
 
     static void configLogging(unsigned level, bool useFile = true);
 
@@ -120,23 +116,21 @@ public:
 
     static void sbsLabelingFromRowCol(unsigned row, unsigned col, std::string & labelStr);
 
-    static void getLabelForPosition(
-        unsigned row,
-        unsigned col,
-        unsigned rowsMax,
-        unsigned colsMax,
-        Orientation orientation,
-        BarcodePosition barcodePosition,
-        std::string & labelStr);
+    static void getLabelForPosition(unsigned row,
+                                    unsigned col,
+                                    unsigned rowsMax,
+                                    unsigned colsMax,
+                                    Orientation orientation,
+                                    BarcodePosition barcodePosition,
+                                    std::string & labelStr);
 
     static PalletSize getPalletSizeFromString(std::string & palletSizeStr);
 
 protected:
-    int decodeCommon(
-            const Image & image,
-            const DecodeOptions & decodeOptions,
-            const std::string &decodedDibFilename,
-            std::vector<std::unique_ptr<const WellRectangle> > & wellRects);
+    int decodeCommon(const Image & image,
+                     const DecodeOptions & decodeOptions,
+                     const std::string &decodedDibFilename,
+                     std::vector<std::unique_ptr<const WellRectangle> > & wellRects);
 
     void writeDecodedImage(const Image & image, const std::string & decodedDibFilename);
 

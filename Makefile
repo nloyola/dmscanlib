@@ -26,7 +26,9 @@ SRCS := \
 	src/decoder/WellDecoder.cpp \
 	src/decoder/ThreadMgr.cpp \
 	src/imgscanner/ImgScanner.cpp \
-	src/imgscanner/ImgScannerSimulator.cpp \
+	src/imgscanner/ImgScannerSane.cpp \
+	src/imgscanner/SaneOption.cpp \
+	src/imgscanner/SaneUtil.cpp \
 	src/utils/DmTimeLinux.cpp \
 	src/Image.cpp
 
@@ -35,6 +37,9 @@ TEST_SRCS := \
 	src/test/ImageInfo.cpp \
 	src/test/Tests.cpp \
 	src/test/TestDmScanLib.cpp \
+	src/test/TestDmScanLibLinux.cpp \
+	src/test/TestImgScanner.cpp \
+	src/test/TestImgScannerLinux.cpp \
 	src/test/TestCommon.cpp
 
 ifeq ($(MAKECMDGOALS),test)
@@ -44,19 +49,22 @@ endif
 FILES = $(notdir $(SRCS))
 PATHS = $(sort $(dir $(SRCS) ) )
 OBJS := $(addprefix $(BUILD_DIR)/, $(FILES:.cpp=.o))
-DEPS := $(OBJS:.o=.P)
 
 INCLUDE_PATH := $(foreach inc,$(PATHS),$(inc)) third_party/libdmtx third_party/glog/src \
 	$(JAVA_HOME)/include $(JAVA_HOME)/include/linux
 
-LIBS := -lglog -ldmtx -lOpenThreads -lopencv_core -lopencv_highgui -lopencv_imgproc
+LIBS := -lglog -ldmtx -lOpenThreads -lopencv_core -lopencv_highgui -lopencv_imgproc -lsane
 TEST_LIBS := -lgtest -lconfig++ -lpthread
 LIB_PATH :=
 
 CC := g++
 CXX := $(CC)
-CFLAGS := -O3 -fmessage-length=0 -fPIC -std=gnu++0x
+CFLAGS := -fmessage-length=0 -fPIC -std=gnu++0x
 SED := /bin/sed
+
+ifneq ($(MAKECMDGOALS),test)
+CFLAGS += -O3
+endif
 
 ifeq ($(OSTYPE),mingw32)
 	HOST := windows
@@ -122,7 +130,6 @@ clean:
 
 doc: doxygen.cfg
 	doxygen $<
-
 #
 # This rule also creates the dependency files
 #
@@ -134,8 +141,4 @@ $(BUILD_DIR)/%.o : %.cpp
 		-e '/^$$/ d' -e 's/$$/ :/' < $(BUILD_DIR)/$*.d >> $(BUILD_DIR)/$*.P; \
 	rm -f $(BUILD_DIR)/$*.d
 
--include $(DEPS)
-
-# for emacs flymake
-check-syntax:
-	$(CXX) -Wall -Wextra -pedantic -fsyntax-only -o nul -S $(CHK_SOURCES)
+-include $(OBJS:.o=.P)
