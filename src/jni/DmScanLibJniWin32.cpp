@@ -52,24 +52,14 @@ void getResultCodeMsg(int resultCode, std::string & message) {
 
 } /* namespace */
 
-/*
- * Class:     edu_ualberta_med_scannerconfig_dmscanlib_ScanLib
- * Method:    slSelectSourceAsDefault
- * Signature: ()Ledu/ualberta/med/scannerconfig/dmscanlib/ScanLibResult;
- */
-JNIEXPORT jobject JNICALL Java_edu_ualberta_med_scannerconfig_dmscanlib_ScanLib_selectSourceAsDefault(
+JNIEXPORT jobject JNICALL Java_org_biobank_platedecoder_dmscanlib_ScanLib_selectSourceAsDefault(
                 JNIEnv * env, jobject obj) {
     dmscanlib::DmScanLib dmScanLib;
     int result = dmScanLib.selectSourceAsDefault();
     return dmscanlib::jni::createScanResultObject(env, result, result);
 }
 
-/*
- * Class:     edu_ualberta_med_scannerconfig_dmscanlib_ScanLib
- * Method:    slGetScannerCapability
- * Signature: ()Ledu/ualberta/med/scannerconfig/dmscanlib/ScanLibResult;
- */
-JNIEXPORT jobject JNICALL Java_edu_ualberta_med_scannerconfig_dmscanlib_ScanLib_getScannerCapability(
+JNIEXPORT jobject JNICALL Java_org_biobank_platedecoder_dmscanlib_ScanLib_getScannerCapability(
         JNIEnv * env,
         jobject obj) {
     dmscanlib::DmScanLib dmScanLib;
@@ -77,22 +67,17 @@ JNIEXPORT jobject JNICALL Java_edu_ualberta_med_scannerconfig_dmscanlib_ScanLib_
     return dmscanlib::jni::createScanResultObject(env, dmscanlib::SC_SUCCESS, result);
 }
 
-/*
- * Class:     edu_ualberta_med_scannerconfig_dmscanlib_ScanLib
- * Method:    slScanImage
- * Signature: (JJIIDDDDLjava/lang/String;)Ledu/ualberta/med/scannerconfig/dmscanlib/ScanLibResult;
- */
-JNIEXPORT jobject JNICALL Java_edu_ualberta_med_scannerconfig_dmscanlib_ScanLib_scanImage(
-                JNIEnv * env, 
-				jobject obj, 
-				jlong _verbose, 
+JNIEXPORT jobject JNICALL Java_org_biobank_platedecoder_dmscanlib_ScanLib_scanImage(
+                JNIEnv * env,
+				jobject obj,
+				jlong _verbose,
 				jlong _dpi,
-                jint _brightness, 
-				jint _contrast, 
-				jdouble x, 
-				jdouble y, 
-				jdouble width, 
-				jdouble height, 
+                jint _brightness,
+				jint _contrast,
+				jdouble x,
+				jdouble y,
+				jdouble width,
+				jdouble height,
                 jstring _filename) {
 
     if ((_dpi == 0)	|| (_filename == 0)) {
@@ -107,9 +92,9 @@ JNIEXPORT jobject JNICALL Java_edu_ualberta_med_scannerconfig_dmscanlib_ScanLib_
 
     dmscanlib::DmScanLib dmScanLib(verbose);
     int result = dmScanLib.scanImage(
-		dpi, 
-		brightness, 
-		contrast, 
+		dpi,
+		brightness,
+		contrast,
 		static_cast<float>(x),
 		static_cast<float>(y),
 		static_cast<float>(width),
@@ -120,18 +105,13 @@ JNIEXPORT jobject JNICALL Java_edu_ualberta_med_scannerconfig_dmscanlib_ScanLib_
     return resultObj;
 }
 
-/*
- * Class:     edu_ualberta_med_scannerconfig_dmscanlib_ScanLib
- * Method:    slScanFlatbed
- * Signature: (JJIILjava/lang/String;)Ledu/ualberta/med/scannerconfig/dmscanlib/ScanLibResult;
- */
-JNIEXPORT jobject JNICALL Java_edu_ualberta_med_scannerconfig_dmscanlib_ScanLib_scanFlatbed(
-                JNIEnv * env, 
-				jobject obj, 
-				jlong _verbose, 
+JNIEXPORT jobject JNICALL Java_org_biobank_platedecoder_dmscanlib_ScanLib_scanFlatbed(
+                JNIEnv * env,
+				jobject obj,
+				jlong _verbose,
 				jlong _dpi,
-                jint _brightness, 
-				jint _contrast, 
+                jint _brightness,
+				jint _contrast,
 				jstring _filename) {
 
     if ((_dpi == 0)	|| (_filename == 0)) {
@@ -151,22 +131,17 @@ JNIEXPORT jobject JNICALL Java_edu_ualberta_med_scannerconfig_dmscanlib_ScanLib_
     return resultObj;
 }
 
-/*
- * Class:     edu_ualberta_med_scannerconfig_dmscanlib_ScanLib
- * Method:    slDecodePlate
- * Signature: (JJIIJDDDDDJJJDDDJJJJ)Ledu/ualberta/med/scannerconfig/dmscanlib/DecodeResult;
- */
-JNIEXPORT jobject JNICALL Java_edu_ualberta_med_scannerconfig_dmscanlib_ScanLib_scanAndDecode(
+JNIEXPORT jobject JNICALL Java_org_biobank_platedecoder_dmscanlib_ScanLib_scanAndDecode(
         JNIEnv * env,
-  jobject obj, 
-  jlong _verbose, 
+  jobject obj,
+  jlong _verbose,
   jlong _dpi,
   jint _brightness,
-  jint _contrast, 
-  jdouble x, 
-  jdouble y, 
-  jdouble width, 
-  jdouble height, 
+  jint _contrast,
+  jdouble x,
+  jdouble y,
+  jdouble width,
+  jdouble height,
   jobject _decodeOptions,
   jobjectArray _wellRects) {
 
@@ -181,7 +156,7 @@ JNIEXPORT jobject JNICALL Java_edu_ualberta_med_scannerconfig_dmscanlib_ScanLib_
     unsigned contrast = static_cast<unsigned>(_contrast);
     std::vector<std::unique_ptr<const dmscanlib::WellRectangle> > wellRects;
 
-    std::unique_ptr<dmscanlib::DecodeOptions> decodeOptions = 
+    std::unique_ptr<dmscanlib::DecodeOptions> decodeOptions =
 		dmscanlib::DecodeOptions::getDecodeOptionsViaJni(env, _decodeOptions);
 
 	jsize numWells = env->GetArrayLength(_wellRects);
@@ -197,14 +172,14 @@ JNIEXPORT jobject JNICALL Java_edu_ualberta_med_scannerconfig_dmscanlib_ScanLib_
 
     dmscanlib::DmScanLib dmScanLib(0);
     result = dmScanLib.scanAndDecode(
-		dpi, 
-		brightness, 
-		contrast, 
+		dpi,
+		brightness,
+		contrast,
 		static_cast<float>(x),
 		static_cast<float>(y),
 		static_cast<float>(width),
 		static_cast<float>(height),
-		*decodeOptions, 
+		*decodeOptions,
 		wellRects);
 
 	if (result == dmscanlib::SC_SUCCESS) {

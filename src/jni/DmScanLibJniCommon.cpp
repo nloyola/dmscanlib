@@ -21,7 +21,7 @@ namespace jni {
 
 jobject createScanResultObject(JNIEnv * env, int resultCode, int value) {
     jclass scanLibResultClass = env->FindClass(
-            "edu/ualberta/med/scannerconfig/dmscanlib/ScanLibResult");
+            "org/biobank/platedecoder/dmscanlib/ScanLibResult");
 
     // run the following command to obtain method signatures from a class.
     // javap -s -p edu.ualberta.med.scannerconfig.dmscanlib.ScanLibResult
@@ -41,10 +41,10 @@ jobject createScanResultObject(JNIEnv * env, int resultCode, int value) {
 
 jobject createDecodeResultObject(JNIEnv * env, int resultCode) {
     jclass resultClass = env->FindClass(
-            "edu/ualberta/med/scannerconfig/dmscanlib/DecodeResult");
+            "org/biobank/platedecoder/dmscanlib/DecodeResult");
 
     // run the following command to obtain method signatures from a class.
-    // javap -s -p edu.ualberta.med.scannerconfig.dmscanlib.DecodeResult
+    // javap -s -p org.biobank.platedecoder.dmscanlib.DecodeResult
     jmethodID cons = env->GetMethodID(resultClass, "<init>",
             "(IILjava/lang/String;)V");
 
@@ -64,7 +64,7 @@ jobject createDecodeResultObject(JNIEnv * env, int resultCode,
     jobject resultObj = createDecodeResultObject(env, resultCode);
 
     jclass resultClass = env->FindClass(
-            "edu/ualberta/med/scannerconfig/dmscanlib/DecodeResult");
+            "org/biobank/platedecoder/dmscanlib/DecodeResult");
 
     if (wellDecoders.size() > 0) {
         jmethodID setCellMethod = env->GetMethodID(resultClass, "addWell",
@@ -153,10 +153,10 @@ int getWellRectangles(JNIEnv *env, jsize numWells, jobjectArray _wellRects,
         double ymax = std::max(y1, std::max(y2, std::max(y3, y4)));
 
         std::unique_ptr<const WellRectangle> wellRect(
-                new WellRectangle(label, 
-				static_cast<unsigned>(xmin), 
-				static_cast<unsigned>(ymin), 
-				static_cast<unsigned>(xmax - xmin), 
+                new WellRectangle(label,
+				static_cast<unsigned>(xmin),
+				static_cast<unsigned>(ymin),
+				static_cast<unsigned>(xmax - xmin),
 				static_cast<unsigned>(ymax - ymin)));
 
         VLOG(5) << *wellRect;
@@ -173,12 +173,7 @@ int getWellRectangles(JNIEnv *env, jsize numWells, jobjectArray _wellRects,
 
 } /* namespace */
 
-/*
- * Class:     edu_ualberta_med_scannerconfig_dmscanlib_ScanLib
- * Method:    decodeImage
- * Signature: (JLjava/lang/String;Ledu/ualberta/med/scannerconfig/dmscanlib/DecodeOptions;[Ledu/ualberta/med/scannerconfig/dmscanlib/Well;)Ledu/ualberta/med/scannerconfig/dmscanlib/DecodeResult;
- */
-JNIEXPORT jobject JNICALL Java_edu_ualberta_med_scannerconfig_dmscanlib_ScanLib_decodeImage(
+JNIEXPORT jobject JNICALL Java_org_biobank_platedecoder_dmscanlib_ScanLib_decodeImage(
         JNIEnv * env, jobject obj, jlong _verbose, jstring _filename,
         jobject _decodeOptions, jobjectArray _wellRects) {
 

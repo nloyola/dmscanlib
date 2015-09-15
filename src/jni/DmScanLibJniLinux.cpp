@@ -44,33 +44,18 @@ void getResultCodeMsg(int resultCode, std::string & message) {
 
 } /* namespace */
 
-/*
- * Class:     edu_ualberta_med_scannerconfig_dmscanlib_ScanLib
- * Method:    slSelectSourceAsDefault
- * Signature: ()Ledu/ualberta/med/scannerconfig/dmscanlib/ScanLibResult;
- */
-JNIEXPORT jobject JNICALL Java_edu_ualberta_med_scannerconfig_dmscanlib_ScanLib_selectSourceAsDefault(
+JNIEXPORT jobject JNICALL Java_org_biobank_platedecoder_dmscanlib_ScanLib_selectSourceAsDefault(
         JNIEnv * env,
         jobject obj) {
     return dmscanlib::jni::createScanResultObject(env, dmscanlib::SC_FAIL, dmscanlib::SC_FAIL);
 }
 
-/*
- * Class:     edu_ualberta_med_scannerconfig_dmscanlib_ScanLib
- * Method:    slGetScannerCapability
- * Signature: ()Ledu/ualberta/med/scannerconfig/dmscanlib/ScanLibResult;
- */
-JNIEXPORT jobject JNICALL Java_edu_ualberta_med_scannerconfig_dmscanlib_ScanLib_getScannerCapability(
+JNIEXPORT jobject JNICALL Java_org_biobank_platedecoder_dmscanlib_ScanLib_getScannerCapability(
         JNIEnv * env, jobject obj) {
     return dmscanlib::jni::createScanResultObject(env, dmscanlib::SC_FAIL, dmscanlib::SC_FAIL);
 }
 
-/*
- * Class:     edu_ualberta_med_scannerconfig_dmscanlib_ScanLib
- * Method:    slScanImage
- * Signature: (JJIIDDDDLjava/lang/String;)Ledu/ualberta/med/scannerconfig/dmscanlib/ScanLibResult;
- */
-JNIEXPORT jobject JNICALL Java_edu_ualberta_med_scannerconfig_dmscanlib_ScanLib_scanImage(
+JNIEXPORT jobject JNICALL Java_org_biobank_platedecoder_dmscanlib_ScanLib_scanImage(
         JNIEnv * env,
         jobject obj,
         jlong _verbose,
@@ -85,12 +70,7 @@ JNIEXPORT jobject JNICALL Java_edu_ualberta_med_scannerconfig_dmscanlib_ScanLib_
     return dmscanlib::jni::createScanResultObject(env, dmscanlib::SC_FAIL, dmscanlib::SC_FAIL);
 }
 
-/*
- * Class:     edu_ualberta_med_scannerconfig_dmscanlib_ScanLib
- * Method:    slScanFlatbed
- * Signature: (JJIILjava/lang/String;)Ledu/ualberta/med/scannerconfig/dmscanlib/ScanLibResult;
- */
-JNIEXPORT jobject JNICALL Java_edu_ualberta_med_scannerconfig_dmscanlib_ScanLib_scanFlatbed(
+JNIEXPORT jobject JNICALL Java_org_biobank_platedecoder_dmscanlib_ScanLib_scanFlatbed(
         JNIEnv * env,
         jobject obj,
         jlong _verbose,
@@ -101,12 +81,7 @@ JNIEXPORT jobject JNICALL Java_edu_ualberta_med_scannerconfig_dmscanlib_ScanLib_
     return dmscanlib::jni::createScanResultObject(env, dmscanlib::SC_FAIL, dmscanlib::SC_FAIL);
 }
 
-/*
- * Class:     edu_ualberta_med_scannerconfig_dmscanlib_ScanLib
- * Method:    scanAndDecode
- * Signature: (JJIILedu/ualberta/med/scannerconfig/dmscanlib/BoundingBox;Ledu/ualberta/med/scannerconfig/dmscanlib/DecodeOptions;[Ledu/ualberta/med/scannerconfig/dmscanlib/CellRectangle;)Ledu/ualberta/med/scannerconfig/dmscanlib/DecodeResult;
- */
-JNIEXPORT jobject JNICALL Java_edu_ualberta_med_scannerconfig_dmscanlib_ScanLib_scanAndDecode(
+JNIEXPORT jobject JNICALL Java_org_biobank_platedecoder_dmscanlib_ScanLib_scanAndDecode(
         JNIEnv * env,
         jobject obj,
         jlong _verbose,
