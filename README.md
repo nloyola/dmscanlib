@@ -10,9 +10,11 @@ from patients.
 
 ## Build with Makefile
 
-The Makefile crates an executable that runs the tests. Tests were written using
+Under Linux, the makefile creates a shared library.
+
+~~The Makefile crates an executable that runs the tests. Tests were written using
 [Google Test](https://code.google.com/p/googletest/). See below for instructions on how to set up
-on your development environment.
+on your development environment~~.
 
 ## Using Eclipse for development
 
@@ -46,14 +48,16 @@ The JNI class used to interface to dmscanlib is DmScanLibJni. To generate
 the C header file use the following commands:
 
 ```bash
-cd to <scannerConfig_proj>/bin
-javah -jni edu.ualberta.med.scannerconfig.dmscanlib.ScanLib
-mv edu_ualberta_med_scannerconfig_dmscanlib_ScanLib.h <dmscanlib_proj>/src/jni/DmScanLibJni.h
+cd to <platedecoder_proj>/bin
+javah -jni org.biobank.platedecoder.dmscanlib.ScanLib
+mv org_biobank_platedecoder_dmscanlib_ScanLib.h <dmscanlib_proj>/src/jni/DmScanLibJni.h
 ```
 
-Where **scannerConfig_proj** is the Java pluging project used by Biobank.
+Where **platedecoder_proj** is the Java project used by Biobank.
 
 ## Google Test
+
+Google Test has to be built and installed.
 
 ```bash
 sudo apt-get install cmake
