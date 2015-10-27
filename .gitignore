@@ -20,3 +20,5 @@ dmscanlib.sdf
 dmscanlib.v11.suo
 dmscanlib.vcxproj.filters
 dmscanlib.vcxproj.user
+/test
+/all_images_results.csv
