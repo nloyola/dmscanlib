@@ -115,6 +115,7 @@ int getWellRectangles(JNIEnv *env, jsize numWells, jobjectArray _wellRects,
             wellRectGetLabelMethodID = env->GetMethodID(wellRectJavaClass,
                     "getLabel", "()Ljava/lang/String;");
             if (env->ExceptionOccurred()) {
+                VLOG(5) << "decodeImage: get method getLabel() failed";
                 return 0;
             }
 
@@ -166,6 +167,9 @@ int getWellRectangles(JNIEnv *env, jsize numWells, jobjectArray _wellRects,
         env->ReleaseStringUTFChars((jstring) labelJobj, label);
         env->DeleteLocalRef(wellRectJavaObj);
     }
+
+
+    VLOG(5) << "decodeImage: success";
     return 1;
 }
 
@@ -191,6 +195,7 @@ JNIEXPORT jobject JNICALL Java_org_biobank_platedecoder_dmscanlib_ScanLib_decode
 
     if (result == 0) {
         // got an exception when converting from JNI
+        VLOG(5) << "got an exception when converting from JNI";
         return NULL;
     } else if ((result != 1) || (wellRects.size() == 0)) {
         // invalid rects or zero rects passed from java
