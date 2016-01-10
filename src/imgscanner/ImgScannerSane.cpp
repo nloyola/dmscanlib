@@ -38,8 +38,8 @@ namespace dmscanlib {
 
 namespace imgscanner {
 
-double ImgScannerSane::inchesToMm = 25.4;
-double ImgScannerSane::mmToInches = 1.0 / ImgScannerSane::inchesToMm;
+const double ImgScannerSane::inchesToMm = 25.4;
+const double ImgScannerSane::mmToInches = 1.0 / ImgScannerSane::inchesToMm;
 
 ImgScannerSane::ImgScannerSane() {
    init();
@@ -49,7 +49,11 @@ ImgScannerSane::~ImgScannerSane() {
 }
 
 void ImgScannerSane::init() {
+   VLOG(2) << "init:";
+
    deviceName.clear();
+   saneOptions.clear();
+
    resolutionOption     = -1;
    scanModeOption       = -1;
    contrastOption       = -1;
@@ -185,27 +189,85 @@ int ImgScannerSane::getScannerCapability() {
    return 1;
 }
 
+void ImgScannerSane::getFlatbedDimensionsInInches(std::pair<float, float> & dimensions) {
+   VLOG(2) << "getFlatbedDimensionsInInches";
+
+   CHECK_GT(deviceName.length(), 0) << "no device selected";
+
+   if (saneOptions.empty()) {
+      getScannerCapability();
+   }
+
+   SaneOptionRangeConstraint<double> const * rightOpt = getOptionRangeDouble(geometryRightOption);
+   SaneOptionRangeConstraint<double> const * bottomOpt = getOptionRangeDouble(geometryBottomOption);
+
+   dimensions.first = rightOpt->getMax() * mmToInches;
+   dimensions.second = bottomOpt->getMax() * mmToInches;
+}
+
+void ImgScannerSane::getBrightnessRange(std::pair<int, int> & pair) {
+   VLOG(2) << "getBrightnessRange";
+
+   CHECK_GT(deviceName.length(), 0) << "no device selected";
+
+   if (saneOptions.empty()) {
+      getScannerCapability();
+   }
+
+   SaneOptionRangeConstraint<int> const * opt = getOptionRangeInt(brightnessOption);
+
+   pair.first = opt->getMin();
+   pair.second = opt->getMax();
+}
+
+void ImgScannerSane::getContrastRange(std::pair<int, int> & pair) {
+   VLOG(2) << "getContrastRange";
+
+   CHECK_GT(deviceName.length(), 0) << "no device selected";
+
+   if (saneOptions.empty()) {
+      getScannerCapability();
+   }
+
+   SaneOptionRangeConstraint<int> const * opt = getOptionRangeInt(contrastOption);
+
+   pair.first = opt->getMin();
+   pair.second = opt->getMax();
+}
+
 /**
  * bbox units are in inches.
  */
-std::unique_ptr<Image> ImgScannerSane::acquireImage(const unsigned dpi,
-                                                    const int brightness,
-                                                    const int contrast,
-                                                    const cv::Rect_<float> & bboxInches) {
+std::unique_ptr<Image> ImgScannerSane::acquireImage(unsigned dpi,
+                                                    int brightness,
+                                                    int contrast,
+                                                    float left,
+                                                    float top,
+                                                    float right,
+                                                    float bottom) {
    VLOG(3) << "acquireImage: source: \"" << deviceName << "\""
            << ", dpi: " << dpi
            << ", brightness:" << brightness
            << ", constrast:" << contrast
-           << ", rect (inches):" << bboxInches;
+           << ", left: " << left
+           << ", top: " << top
+           << ", right: " << right
+           << ", bottom: " << bottom;
 
    CHECK_GT(deviceName.length(), 0) << "no device selected";
 
-   cv::Rect_<double> bboxMillimeters(static_cast<double>(bboxInches.x) * inchesToMm,
-                                     static_cast<double>(bboxInches.y) * inchesToMm,
-                                     static_cast<double>(bboxInches.width) * inchesToMm,
-                                     static_cast<double>(bboxInches.height) * inchesToMm);
+   double leftMillimeters   = static_cast<double>(left) * inchesToMm;
+   double topMillimeters    = static_cast<double>(top) * inchesToMm;
+   double rightMillimeters  = static_cast<double>(right) * inchesToMm;
+   double bottomMillimeters = static_cast<double>(bottom) * inchesToMm;
 
-   return acquireImageInternal(dpi, brightness, contrast, bboxMillimeters);
+   return acquireImageInternal(dpi,
+                               brightness,
+                               contrast,
+                               leftMillimeters,
+                               topMillimeters,
+                               rightMillimeters,
+                               bottomMillimeters);
 }
 
 std::unique_ptr<Image>  ImgScannerSane::acquireFlatbed(unsigned dpi, int brightness, int contrast) {
@@ -224,67 +286,27 @@ std::unique_ptr<Image>  ImgScannerSane::acquireFlatbed(unsigned dpi, int brightn
    double bottom = getOptionRangeDouble(geometryBottomOption)->getMax();
 
    cv::Rect_<double> scanRect(left, top, right, bottom);
-   return acquireImageInternal(dpi, brightness, contrast, scanRect);
-}
-
-void ImgScannerSane::getFlatbedDimensionsInInches(std::pair<double, double> & pair) {
-   VLOG(2) << "getFlatbedDimensionsInInches";
-
-   CHECK_GT(deviceName.length(), 0) << "no device selected";
-
-   if (saneOptions.empty()) {
-      getScannerCapability();
-   }
-
-   SaneOptionRangeConstraint<double> const * rightOpt = getOptionRangeDouble(geometryRightOption);
-   SaneOptionRangeConstraint<double> const * bottomOpt = getOptionRangeDouble(geometryBottomOption);
-
-   pair.first = rightOpt->getMax() * mmToInches;
-   pair.second = bottomOpt->getMax() * mmToInches;
-}
-
-void ImgScannerSane::getBrightnessRange(std::pair<double, double> & pair) {
-   VLOG(2) << "getBrightnessRange";
-
-   CHECK_GT(deviceName.length(), 0) << "no device selected";
-
-   if (saneOptions.empty()) {
-      getScannerCapability();
-   }
-
-   SaneOptionRangeConstraint<double> const * opt = getOptionRangeDouble(brightnessOption);
-
-   pair.first = opt->getMin();
-   pair.second = opt->getMax();
-}
-
-void ImgScannerSane::getContrastRange(std::pair<double, double> & pair) {
-   VLOG(2) << "getContrastRange";
-
-   CHECK_GT(deviceName.length(), 0) << "no device selected";
-
-   if (saneOptions.empty()) {
-      getScannerCapability();
-   }
-
-   SaneOptionRangeConstraint<double> const * opt = getOptionRangeDouble(contrastOption);
-
-   pair.first = opt->getMin();
-   pair.second = opt->getMax();
+   return acquireImageInternal(dpi, brightness, contrast, left, top, right, bottom);
 }
 
 /**
- * bbox units are in millimeters.
+ * Flatbed coordinates are in inches.
  */
-std::unique_ptr<Image> ImgScannerSane::acquireImageInternal(const unsigned dpi,
-                                                            const int brightness,
-                                                            const int contrast,
-                                                            const cv::Rect_<double> & bboxMillimeters) {
+std::unique_ptr<Image> ImgScannerSane::acquireImageInternal(unsigned dpi,
+                                                            int brightness,
+                                                            int contrast,
+                                                            float left,
+                                                            float top,
+                                                            float right,
+                                                            float bottom) {
    VLOG(2) << "acquireImageInternal: source: \"" << deviceName << "\""
            << ", dpi: " << dpi
            << ", brightness:" << brightness
            << ", constrast:" << contrast
-           << ", rect (millimeters):" << bboxMillimeters;
+           << ", left: " << left
+           << ", top: " << top
+           << ", right: " << right
+           << ", bottom: " << bottom;
 
    if (saneOptions.empty()) {
       getScannerCapability();
@@ -306,11 +328,11 @@ std::unique_ptr<Image> ImgScannerSane::acquireImageInternal(const unsigned dpi,
    SaneOptionRangeConstraint<double> const * rightOpt = getOptionRangeDouble(geometryRightOption);
    SaneOptionRangeConstraint<double> const * bottomOpt = getOptionRangeDouble(geometryBottomOption);
 
-   CHECK(rightOpt->validValue(bboxMillimeters.x)) << "bounding box exeeds flatbed dimensions";
-   CHECK(rightOpt->validValue(bboxMillimeters.width)) << "bounding box exeeds flatbed dimensions";
+   CHECK(rightOpt->validValue(left)) << "bounding box exeeds flatbed dimensions";
+   CHECK(rightOpt->validValue(right)) << "bounding box exeeds flatbed dimensions";
 
-   CHECK(bottomOpt->validValue(bboxMillimeters.y)) << "bounding box exeeds flatbed dimensions";
-   CHECK(bottomOpt->validValue(bboxMillimeters.height)) << "bounding box exeeds flatbed dimensions";
+   CHECK(bottomOpt->validValue(top)) << "bounding box exeeds flatbed dimensions";
+   CHECK(bottomOpt->validValue(bottom)) << "bounding box exeeds flatbed dimensions";
 
    errorCode = SC_SUCCESS;
 
@@ -322,10 +344,10 @@ std::unique_ptr<Image> ImgScannerSane::acquireImageInternal(const unsigned dpi,
    SaneUtil::setControlOptionString(saneHandle, compressionOption, "None");
    SaneUtil::setControlOptionWord(saneHandle, brightnessOption, brightness);
    SaneUtil::setControlOptionWord(saneHandle, contrastOption, contrast);
-   SaneUtil::setControlOptionWord(saneHandle, geometryLeftOption, SANE_FIX(bboxMillimeters.x));
-   SaneUtil::setControlOptionWord(saneHandle, geometryTopOption, SANE_FIX(bboxMillimeters.y));
-   SaneUtil::setControlOptionWord(saneHandle, geometryRightOption, SANE_FIX(bboxMillimeters.width));
-   SaneUtil::setControlOptionWord(saneHandle, geometryBottomOption, SANE_FIX(bboxMillimeters.height));
+   SaneUtil::setControlOptionWord(saneHandle, geometryLeftOption, SANE_FIX(left));
+   SaneUtil::setControlOptionWord(saneHandle, geometryTopOption, SANE_FIX(top));
+   SaneUtil::setControlOptionWord(saneHandle, geometryRightOption, SANE_FIX(right));
+   SaneUtil::setControlOptionWord(saneHandle, geometryBottomOption, SANE_FIX(bottom));
 
    VLOG(5) << "scan region: ("
            << SANE_UNFIX(SaneUtil::getControlOptionWord(saneHandle, geometryLeftOption))

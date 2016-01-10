@@ -35,8 +35,7 @@ namespace dmscanlib {
 class Image;
 
 /**
- * This class interfaces with the TWAIN driver to acquire images from the
- * scanner.
+ * This class interfaces with the flatbed scanner to acquire images.
  */
 class ImgScanner {
 public:
@@ -44,20 +43,36 @@ public:
 
    virtual ~ImgScanner();
 
+   /**
+    * Factory method to create appropriate instance for operating system.
+    */
    static std::unique_ptr<ImgScanner> create();
 
    virtual bool selectSourceAsDefault() = 0;
 
+   virtual void getDeviceNames(std::vector<std::string> & names) = 0;
+
+   virtual void selectDevice(std::string const & name) = 0;
+
    virtual int getScannerCapability() = 0;
 
-   virtual std::unique_ptr<Image> acquireImage(const unsigned dpi,
-                                               const int brightness,
-                                               const int contrast,
-                                               const cv::Rect_<float> & bbox) = 0;
+   virtual void getFlatbedDimensionsInInches(std::pair<float, float> & dimensions) = 0;
 
-   virtual std::unique_ptr<Image> acquireFlatbed(const unsigned dpi,
-                                                 const int brightness,
-                                                 const int contrast) = 0;
+   virtual void getBrightnessRange(std::pair<int, int> & pair) = 0;
+
+   virtual void getContrastRange(std::pair<int, int> & pair) = 0;
+
+   virtual std::unique_ptr<Image> acquireImage(unsigned dpi,
+                                               int brightness,
+                                               int contrast,
+                                               float left,
+                                               float top,
+                                               float right,
+                                               float bottom) = 0;
+
+   virtual std::unique_ptr<Image> acquireFlatbed(unsigned dpi,
+                                                 int brightness,
+                                                 int contrast) = 0;
 
    virtual int getErrorCode() = 0;
 

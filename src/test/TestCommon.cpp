@@ -12,6 +12,7 @@
 #include "Image.h"
 #include "decoder/WellRectangle.h"
 #include "decoder/DecodeOptions.h"
+#include "imgscanner/ImgScanner.h"
 
 #include <sstream>
 
@@ -32,6 +33,21 @@
 namespace dmscanlib {
 
 namespace test {
+
+std::string getFirstDevice() {
+   std::string result;
+
+#ifndef WIN32
+   std::unique_ptr<ImgScanner> imgScanner = ImgScanner::create();
+   std::vector<std::string> deviceNames;
+   imgScanner->getDeviceNames(deviceNames);
+   CHECK_GT(deviceNames.size(), 0);
+   imgScanner->selectDevice(deviceNames[0]);
+   result.append(deviceNames[0]);
+#endif
+
+   return result;
+}
 
 /*
  * Gets file names for all the test information files in the "testImageInfo" folder.
@@ -112,8 +128,8 @@ bool getTestImageInfoFilenames(std::string dir, std::vector<std::string> & filen
 }
 
 void getWellRectsForBoundingBox(const cv::Rect & bbox,
-                                const unsigned rows,
-                                const unsigned cols,
+                                unsigned rows,
+                                unsigned cols,
                                 Orientation orientation,
                                 BarcodePosition position,
                                 std::vector<std::unique_ptr<const WellRectangle> > & wellRects) {
@@ -121,13 +137,11 @@ void getWellRectsForBoundingBox(const cv::Rect & bbox,
     float wellWidth = bbox.width / static_cast<float>(cols);
     float wellHeight = bbox.height / static_cast<float>(rows);
 
-    cv::Point2f horTranslation(static_cast<float>(wellWidth), 0);
-    cv::Point2f verTranslation(0, static_cast<float>(wellHeight));
+    cv::Point2f horTranslation(wellWidth, 0);
+    cv::Point2f verTranslation(0, wellHeight);
 
-    // round off the cell size so image dimensions are not exceeded
-    cv::Size cellSize(
-		static_cast<unsigned>(0.999f * wellWidth),
-		static_cast<unsigned>(0.999f * wellHeight));
+    cv::Size cellSize(static_cast<unsigned>(wellWidth),
+                      static_cast<unsigned>(wellHeight));
 
     float horOffset;
     float verOffset = static_cast<float>(bbox.y);
@@ -136,8 +150,12 @@ void getWellRectsForBoundingBox(const cv::Rect & bbox,
         horOffset = static_cast<float>(bbox.x);
 
         for (unsigned col = 0; col < cols; ++col) {
-            std::string label;
-            DmScanLib::getLabelForPosition(row, col, rows, cols, orientation, position, label);
+            std::string label = DmScanLib::getLabelForPosition(row,
+                                                               col,
+                                                               rows,
+                                                               cols,
+                                                               orientation,
+                                                               position);
 
             std::unique_ptr<WellRectangle> wellRect(
                     new WellRectangle(
@@ -147,13 +165,12 @@ void getWellRectsForBoundingBox(const cv::Rect & bbox,
                             cellSize.width,
                             cellSize.height));
             const cv::Rect & wRect = wellRect->getRectangle();
-            if (!bbox.contains(wRect.tl()) || !bbox.contains(wRect.br())) {
-                throw std::logic_error("well rectangle outside image: " + label);
-            }
+
+            CHECK(bbox.contains(wRect.tl())) << "well rectangle top-left outside image: " << label;
+            CHECK(bbox.contains(wRect.br())) << "well rectangle bottom-right outside image: " << label;
 
             VLOG(5) << "getWellRectsForBoundingBox: " << *wellRect;
             wellRects.push_back(std::move(wellRect));
-
 
             horOffset += wellWidth;
         }
@@ -178,9 +195,7 @@ int decodeImage(std::string fname, DmScanLib & dmScanLib, unsigned rows, unsigne
     std::vector<std::unique_ptr<const WellRectangle> > wellRects;
 
     Image image(fname);
-    if (!image.isValid()) {
-        throw std::invalid_argument("could not load image");
-    }
+    CHECK(image.isValid()) << "could not load image";
 
     cv::Size size = image.size();
     cv::Rect bbox(0, 0, size.width, size.height);

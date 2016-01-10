@@ -1,21 +1,16 @@
 #define _CRT_SECURE_NO_DEPRECATE
 
-#include "imgscanner/ImgScanner.h"
-#include "imgscanner/ImgScannerTwain.h"
-#include "imgscanner/ImgScannerSane.h"
-#include "imgscanner/ImgScannerSimulator.h"
+#include "ImgScanner.h"
+#include "ImgScannerTwain.h"
+#include "ImgScannerSane.h"
 
 #include <memory>
 
 namespace dmscanlib {
 
-ImgScanner::ImgScanner() {
+ImgScanner::ImgScanner() {}
 
-}
-
-ImgScanner::~ImgScanner() {
-
-}
+ImgScanner::~ImgScanner() {}
 
 std::unique_ptr<ImgScanner> ImgScanner::create() {
 #ifdef WIN32
@@ -23,7 +18,7 @@ std::unique_ptr<ImgScanner> ImgScanner::create() {
 #elif __GNUC__
     return std::unique_ptr<ImgScanner>(new imgscanner::ImgScannerSane());
 #else
-    return std::unique_ptr<ImgScanner>(new imgscanner::ImgScannerSimulator());
+    #error No ImgScanner implementation for your operating system is available
 #endif
 }
 

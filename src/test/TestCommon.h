@@ -22,15 +22,16 @@ class DmScanLib;
 
 namespace test {
 
+std::string getFirstDevice();
+
 bool getTestImageInfoFilenames(std::string dir, std::vector<std::string> & filenames);
 
-void getWellRectsForBoundingBox(
-        const cv::Rect & bbox,
-        const unsigned rows,
-        const unsigned cols,
-        Orientation orientation,
-        BarcodePosition position,
-        std::vector<std::unique_ptr<const WellRectangle> > & wellRects);
+void getWellRectsForBoundingBox(const cv::Rect & bbox,
+                                unsigned rows,
+                                unsigned cols,
+                                Orientation orientation,
+                                BarcodePosition position,
+                                std::vector<std::unique_ptr<const WellRectangle> > & wellRects);
 
 std::unique_ptr<DecodeOptions> getDefaultDecodeOptions();
 
@@ -39,5 +40,9 @@ int decodeImage(std::string fname, DmScanLib & dmScanLib, unsigned rows, unsigne
 } /* namespace */
 
 } /* namespace */
+
+/* Local Variables: */
+/* mode: c++        */
+/* End:             */
 
 #endif /* __INC_TEST_COMMON */

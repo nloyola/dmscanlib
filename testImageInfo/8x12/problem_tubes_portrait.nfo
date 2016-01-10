@@ -1,5 +1,5 @@
 imageFilename="testImages/8x12/problem_tubes_portrait.bmp"
-boundingBox = { x = 0; y = 30; width = 1637; height = 2507; }
+boundingBox = { x = 0; y = 10; width = 1637; height = 2490; }
 palletSize = { rows = 12; columns=8; }
 orientation="portrait"
 barcodePosition="bottom"
@@ -13,7 +13,7 @@ A4="NUCU253078"
 A5="UNKNOWN_A5"
 A6="UNKNOWN_A6"
 A7="NUBS778705"
-A8="UNKNOWN_A8"
+A8="NUCU172649"
 A9="NUCU106381"
 B1="UNKNOWN_B1"
 B10=""

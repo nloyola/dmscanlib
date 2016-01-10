@@ -53,23 +53,26 @@ public:
 
    int getScannerCapability();
 
-   void getFlatbedDimensionsInInches(std::pair<double, double> & pair);
+   void getFlatbedDimensionsInInches(std::pair<float, float> & dimensions);
 
-   void getBrightnessRange(std::pair<double, double> & pair);
+   void getBrightnessRange(std::pair<int, int> & pair);
 
-   void getContrastRange(std::pair<double, double> & pair);
+   void getContrastRange(std::pair<int, int> & pair);
 
    /**
-    * bbox units are in inches.
+    * Flatbed coordinates are in inches.
     */
-   std::unique_ptr<Image> acquireImage(const unsigned dpi,
-                                       const int brightness,
-                                       const int contrast,
-                                       const cv::Rect_<float> & bboxInches);
+   std::unique_ptr<Image> acquireImage(unsigned dpi,
+                                       int brightness,
+                                       int contrast,
+                                       float left,
+                                       float top,
+                                       float right,
+                                       float bottom);
 
-   std::unique_ptr<Image>  acquireFlatbed(const unsigned dpi,
-                                          const int brightness,
-                                          const int contrast);
+   std::unique_ptr<Image>  acquireFlatbed(unsigned dpi,
+                                          int brightness,
+                                          int contrast);
 
    int getErrorCode() { return errorCode; }
 
@@ -82,13 +85,16 @@ private:
 
    SaneOptionConstraint<int> const * getOptionConstraintInt(int optionNumber);
 
-   std::unique_ptr<Image> acquireImageInternal(const unsigned dpi,
-                                               const int brightness,
-                                               const int contrast,
-                                               const cv::Rect_<double> & bboxMillimeters);
+   std::unique_ptr<Image> acquireImageInternal(unsigned dpi,
+                                               int brightness,
+                                               int contrast,
+                                               float left,
+                                               float top,
+                                               float right,
+                                               float bottom);
 
-   static double inchesToMm;
-   static double mmToInches;
+   static const double inchesToMm;
+   static const double mmToInches;
 
    std::string deviceName;
    SANE_Handle saneHandle;

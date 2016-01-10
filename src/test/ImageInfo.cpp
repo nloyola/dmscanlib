@@ -7,7 +7,7 @@
 
 #define _CRT_SECURE_NO_DEPRECATE
 
-#include "ImageInfo.h" 
+#include "ImageInfo.h"
 
 #include<iostream>
 #include<fstream>
@@ -99,15 +99,13 @@ ImageInfo::ImageInfo(const std::string & fname) :
 
     for (unsigned row = 0; row < palletRows; ++row) {
         for (unsigned col = 0; col < palletCols; ++col) {
-            std::string label, decodedMessage;
-            DmScanLib::getLabelForPosition(
-                    row,
-                    col,
-                    palletRows,
-                    palletCols,
-                    orientation,
-                    barcodePosition,
-                    label);
+            std::string decodedMessage;
+            std::string label = DmScanLib::getLabelForPosition(row,
+                                                               col,
+                                                               palletRows,
+                                                               palletCols,
+                                                               orientation,
+                                                               barcodePosition);
 
             if (root.lookupValue(label, decodedMessage)) {
                 barcodePosition = DmScanLib::getBarcodePositionFromString(barcodePositionStr);

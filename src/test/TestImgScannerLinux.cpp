@@ -34,9 +34,9 @@ TEST(TestImgScannerLinux, selectDevice) {
    imgscanner::ImgScannerSane imgScanner;
    imgScanner.getDeviceNames(deviceNames);
 
-   ASSERT_EQ(1, deviceNames.size());
+   ASSERT_GT(deviceNames.size(), 0);
    // change device name to yours
-   ASSERT_NE(std::string::npos, deviceNames[0].find("psc_2400"));
+   ASSERT_NE(deviceNames[0].find("psc_2400"), std::string::npos);
 
    imgScanner.selectDevice(deviceNames[0]);
 }
@@ -58,14 +58,15 @@ TEST(TestImgScannerLinux, getCapabilityNoDeviceSelected) {
 TEST(TestImgScannerLinux, getCapability) {
    FLAGS_v = 3;
    std::unique_ptr<imgscanner::ImgScannerSane> imgScanner = selectFirstDevice();
-   ASSERT_NE(0, imgScanner->getScannerCapability());
+   ASSERT_NE(imgScanner->getScannerCapability(), 0);
 }
 
 TEST(TestImgScannerLinux, acquireImageNoDeviceSelected) {
    FLAGS_v = 3;
-   cv::Rect_<float> scanRect(0, 0, 1, 1);
+   cv::Rect_<float> rect(0, 0, 1, 1);
    imgscanner::ImgScannerSane imgScanner;
-   EXPECT_DEATH(imgScanner.acquireImage(100, 0, 0, scanRect), "no device selected");
+   EXPECT_DEATH(imgScanner.acquireImage(100, 0, 0, rect.x, rect.y, rect.width, rect.height),
+                "no device selected");
 }
 
 TEST(TestImgScannerLinux, acquireFlatbedNoDeviceSelected) {
@@ -77,13 +78,13 @@ TEST(TestImgScannerLinux, acquireFlatbedNoDeviceSelected) {
 TEST(TestImgScannerLinux, getFlatbedDimensionsInInchesNoDeviceSelected) {
    FLAGS_v = 3;
    imgscanner::ImgScannerSane imgScanner;
-   std::pair<double, double> pair;
+   std::pair<float, float> pair;
    EXPECT_DEATH(imgScanner.getFlatbedDimensionsInInches(pair), "no device selected");
 }
 
 TEST(TestImgScannerLinux, getFlatbedDimensions) {
    std::unique_ptr<imgscanner::ImgScannerSane> imgScanner = selectFirstDevice();
-   std::pair<double, double> pair;
+   std::pair<float, float> pair;
    imgScanner->getFlatbedDimensionsInInches(pair);
    ASSERT_GT(pair.first, 0.0);
    ASSERT_GT(pair.second, 0.0);
@@ -92,15 +93,15 @@ TEST(TestImgScannerLinux, getFlatbedDimensions) {
 TEST(TestImgScannerLinux, getBrightnessRangeNoDeviceSelected) {
    FLAGS_v = 3;
    imgscanner::ImgScannerSane imgScanner;
-   std::pair<double, double> range;
+   std::pair<int, int> range;
    EXPECT_DEATH(imgScanner.getBrightnessRange(range), "no device selected");
 }
 
-TEST(TestImgScannerLinux, acquireImageBadBrightness) {
+TEST(TestImgScannerLinux, getContrastRangeNoDeviceSelected) {
    FLAGS_v = 3;
-   cv::Rect_<float> scanRect(0, 0, 1, 1);
    imgscanner::ImgScannerSane imgScanner;
-   EXPECT_DEATH(imgScanner.acquireImage(100, 0, 0, scanRect), "no device selected");
+   std::pair<int, int> range;
+   EXPECT_DEATH(imgScanner.getContrastRange(range), "no device selected");
 }
 
 } /* namespace */

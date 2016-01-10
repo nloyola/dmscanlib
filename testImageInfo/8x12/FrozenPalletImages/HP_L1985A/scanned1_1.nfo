@@ -1,5 +1,5 @@
 imageFilename="testImages/8x12/FrozenPalletImages/HP_L1985A/scanned1_1.bmp"
-boundingBox = { x = 0; y = 0; width = 2506; height = 1694; }
+boundingBox = { x = 15; y = 30; width = 2481; height = 1644; }
 palletSize = { rows = 8; columns=12; }
 orientation="landscape"
 barcodePosition="bottom"
@@ -20,7 +20,7 @@ B10="NUBS994455"
 B11="NUBS994215"
 B12="NUBS994224"
 B2="NUBV440441"
-B3="UNKNOWN_B3"
+B3="NUBV440511"
 B4="NUBV440405"
 B5="NUBV440414"
 B6="NUBV435494"
@@ -99,4 +99,3 @@ H6="NUBS993094"
 H7="NUBS992970"
 H8="NUBS992855"
 H9="NUBS992989"
-"

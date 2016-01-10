@@ -54,14 +54,20 @@ public:
 
    int getScannerCapability();
 
-   std::unique_ptr<Image> acquireImage(const unsigned dpi,
-                                       const int brightness,
-                                       const int contrast,
-                                       const cv::Rect_<float> & bbox);
+   /**
+    * Flatbed coordinates are in inches.
+    */
+   std::unique_ptr<Image> acquireImage(unsigned dpi,
+                                       int brightness,
+                                       int contrast,
+                                       float left,
+                                       float top,
+                                       float right,
+                                       float bottom);
 
-   std::unique_ptr<Image> acquireFlatbed(const unsigned dpi,
-                                         const int brightness,
-                                         const int contrast);
+   std::unique_ptr<Image>  acquireFlatbed(unsigned dpi,
+                                          int brightness,
+                                          int contrast);
 
    int getErrorCode() { return errorCode; }
 
