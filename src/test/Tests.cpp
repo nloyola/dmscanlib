@@ -29,13 +29,18 @@
 #define _CRT_SECURE_NO_DEPRECATE
 
 #include "DmScanLib.h"
+#include "test/testCommon.h"
 
 #include <gtest/gtest.h>
 
 int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    dmscanlib::DmScanLib::configLogging(1, false);
-    int result = RUN_ALL_TESTS();
-    //std::getchar();
-    return result;
+   ::testing::InitGoogleTest(&argc, argv);
+   dmscanlib::test::initializeTwain();
+   dmscanlib::DmScanLib::configLogging(1, false);
+   int result = RUN_ALL_TESTS();
+
+   // uncomment next line to wait for user to press enter key
+   //std::getchar();
+
+   return result;
 }

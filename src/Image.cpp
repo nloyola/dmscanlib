@@ -107,12 +107,14 @@ Image::Image(HANDLE h) : filename(""), handle(h) {
 
 
 Image::~Image() {
+   VLOG(5) << "Image destructor";
    image.release();
 
 #ifdef WIN32
    if (handle != NULL) {
       GlobalUnlock(handle);
       GlobalFree(handle);
+	  VLOG(5) << "Image handle freed";
    }
 #endif
 }

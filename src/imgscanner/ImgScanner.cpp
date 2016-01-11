@@ -1,8 +1,12 @@
 #define _CRT_SECURE_NO_DEPRECATE
 
 #include "ImgScanner.h"
-#include "ImgScannerTwain.h"
-#include "ImgScannerSane.h"
+
+#ifdef WIN32
+#   include "ImgScannerTwain.h"
+#else
+#   include "ImgScannerSane.h"
+#endif
 
 #include <memory>
 
@@ -21,5 +25,11 @@ std::unique_ptr<ImgScanner> ImgScanner::create() {
     #error No ImgScanner implementation for your operating system is available
 #endif
 }
+
+void ImgScanner::setTwainDsmEntry(DSMENTRYPROC twainDsmEntry) {
+   imgscanner::ImgScannerTwain::setTwainDsmEntry(twainDsmEntry);
+}
+
+
 
 } /* namespace */

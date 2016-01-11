@@ -43,10 +43,7 @@ const int SC_INVALID_NOTHING_TO_DECODE = -6;
 const int SC_INCORRECT_DPI_SCANNED = -7;
 
 const unsigned CAP_IS_WIA = 0x01;
-const unsigned CAP_DPI_300 = 0x02;
-const unsigned CAP_DPI_400 = 0x04;
-const unsigned CAP_DPI_600 = 0x08;
-const unsigned CAP_IS_SCANNER = 0x10;
+const unsigned CAP_IS_SCANNER = 0x02;
 
 class Image;
 class Decoder;

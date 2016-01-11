@@ -55,12 +55,6 @@ TEST(TestImgScannerLinux, getCapabilityNoDeviceSelected) {
    EXPECT_DEATH(imgScanner.getScannerCapability(), "no device selected");
 }
 
-TEST(TestImgScannerLinux, getCapability) {
-   FLAGS_v = 3;
-   std::unique_ptr<imgscanner::ImgScannerSane> imgScanner = selectFirstDevice();
-   ASSERT_NE(imgScanner->getScannerCapability(), 0);
-}
-
 TEST(TestImgScannerLinux, acquireImageNoDeviceSelected) {
    FLAGS_v = 3;
    cv::Rect_<float> rect(0, 0, 1, 1);

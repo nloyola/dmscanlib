@@ -25,9 +25,11 @@
 
 #if defined (WIN32) && ! defined(__MINGW32__)
 #   define NOMINMAX
-#   include <Windows.h>
+#   include <windows.h>
+#   include <twain.h>
 #else
 typedef void* HANDLE;
+typedef void* DSMENTRYPROC;
 #endif
 
 namespace dmscanlib {
@@ -42,6 +44,8 @@ public:
    ImgScanner();
 
    virtual ~ImgScanner();
+
+   static void setTwainDsmEntry(DSMENTRYPROC twainDsmEntry);
 
    /**
     * Factory method to create appropriate instance for operating system.

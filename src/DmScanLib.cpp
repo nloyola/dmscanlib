@@ -115,7 +115,7 @@ int DmScanLib::scanImage(const char * const deviceName,
            << ", bottom: " << bottom
            << ", filename:" << filename;
 
-   CHECK_NE(filename, static_cast<const char * const>(NULL)) << "filename is null";
+   CHECK(filename != NULL) << "filename is null";
 
    imgScanner->selectDevice(deviceName);
    std::unique_ptr<Image> image = imgScanner->acquireImage(dpi,
@@ -351,6 +351,7 @@ std::string DmScanLib::getLabelForPosition(unsigned row,
       default:
          CHECK(false) << "invalid value for barcode position: " << barcodePosition;
    }
+   return NULL;
 }
 
 

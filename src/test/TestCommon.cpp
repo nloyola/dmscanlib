@@ -26,6 +26,7 @@
 #   pragma warning(disable : 4996)
 #   define NOMINMAX
 #   include <windows.h>
+#   include <twain.h>
 #else
 #   include <dirent.h>
 #endif
@@ -33,6 +34,28 @@
 namespace dmscanlib {
 
 namespace test {
+
+#ifdef WIN32
+	static HMODULE g_hLib;
+	static DSMENTRYPROC g_pDSM_Entry;
+#endif
+
+void initializeTwain() {
+#ifdef WIN32
+	g_hLib = LoadLibraryA("TWAIN_32.DLL");
+
+	// Report failure if TWAIN_32.DLL cannot be loaded and terminate
+	CHECK(g_hLib != 0) << "Unable to open TWAIN_32.DLL";
+
+	// Attempt to retrieve DSM_Entry() function address.
+	g_pDSM_Entry =  (DSMENTRYPROC) GetProcAddress(g_hLib, "DSM_Entry");
+	dmscanlib::ImgScanner::setTwainDsmEntry(g_pDSM_Entry);
+
+	// Report failure if DSM_Entry() function not found in TWAIN_32.DLL
+	// and terminate
+	CHECK(g_pDSM_Entry != 0) "Unable to fetch DSM_Entry address";
+#endif
+}
 
 std::string getFirstDevice() {
    std::string result;

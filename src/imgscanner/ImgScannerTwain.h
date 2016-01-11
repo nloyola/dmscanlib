@@ -31,9 +31,78 @@
 #define NOMINMAX
 #include <windows.h>
 
+#define GLOG_NO_ABBREVIATED_SEVERITIES
+#include <glog/logging.h>
+
 namespace dmscanlib {
 
 namespace imgscanner {
+
+/**
+ * Utility class to store a Range Capability's valid values.
+ *
+ * Meant for internal use only.
+ */
+class RangeCapability {
+public:
+   RangeCapability(double _min, double _max, double _step):
+         min(_min), max(_max), step(_step) {}
+
+   RangeCapability():
+         min(-1), max(-1), step(-1) {}
+
+   bool isValid(double value) {
+      return ((value >= min) && (value <= max) && (std::fmod(value, step) == 0));
+   }
+
+   double min;
+   double max;
+   double step;
+};
+
+/**
+ * Utility class to store a Capability's valid values.
+ *
+ * Meant for internal use only.
+ */
+class Capability {
+public:
+   Capability(double min, double max, double step): range(min, max, step) {}
+
+   Capability() {}
+
+   void init() {
+      values.clear();
+      range.min = -1;
+      range.max = -1;
+      range.step = -1;
+   }
+
+   void addValue(double value) {
+      values.push_back(value);
+   }
+
+   void set(double min, double max, double step) {
+      range.min = min;
+      range.max = max;
+      range.step = step;
+   }
+
+   bool isValid(double value) {
+      if (!values.empty()) {
+         return (std::find(values.begin(), values.end(), value) != values.end());
+      } else {
+         return ((value >= range.min)
+                 && (value <= range.max)
+                 && (std::fmod(value, range.step) == 0));
+      }
+      CHECK(FALSE) << "could not determine if capability is valid";
+      return FALSE;
+   }
+
+   RangeCapability range;
+   std::vector<double> values;
+};
 
 /**
  * This class interfaces with the TWAIN driver to acquire images from the
@@ -54,6 +123,16 @@ public:
 
    int getScannerCapability();
 
+   void getDeviceNames(std::vector<std::string> & names);
+
+   void selectDevice(std::string const & name);
+
+   void getFlatbedDimensionsInInches(std::pair<float, float> & dimensions);
+
+   void getBrightnessRange(std::pair<int, int> & pair);
+
+   void getContrastRange(std::pair<int, int> & pair);
+
    /**
     * Flatbed coordinates are in inches.
     */
@@ -73,20 +152,31 @@ public:
 
 private:
 
+   void init();
+
    unsigned invokeTwain(TW_IDENTITY * srcId,
                         unsigned long dg,
                         unsigned dat,
                         unsigned msg,
                         void * data);
 
-   void setFloatToIntPair(const double f, short & whole, unsigned short & frac);
-   int getPaletteSize(BITMAPINFOHEADER& bmInfo);
+   void setFloatToIntPair(double f,
+                          short & whole,
+                          unsigned short & frac);
 
    //BOOL setCapability(TW_IDENTITY * srcId, TW_UINT16 cap,TW_UINT16 value,BOOL sign);
 
-   BOOL setCapOneValue(TW_IDENTITY * srcId, unsigned Cap, unsigned ItemType, unsigned long ItemVal);
+   BOOL setCapOneValue(TW_IDENTITY * srcId,
+                       unsigned Cap,
+                       unsigned ItemType,
+                       unsigned long ItemVal);
 
-   bool getCapability(TW_IDENTITY * srcId, TW_CAPABILITY & twCap);
+   BOOL setCapOneValueFixedPoint(TW_IDENTITY * srcID,
+                                 unsigned Cap,
+                                 TW_INT16 whole,
+                                 TW_UINT16 frac);
+
+   double getCapabilityOneValue(TW_IDENTITY & srcID, TW_UINT16 cap);
 
    inline double uint32ToFloat(TW_UINT32 uint32);
    inline double twfix32ToFloat(TW_FIX32 fix32);
@@ -97,8 +187,9 @@ private:
    void scannerSourceDeinit(HWND & hwnd, TW_IDENTITY & srcID);
 
    int getScannerCapabilityInternal(TW_IDENTITY & srcID);
-   int getResolutionCapability(TW_IDENTITY & srcID, TW_UINT16 cap);
-   double getPhysicalDimensions(TW_IDENTITY & srcID, TW_UINT16 cap);
+   void getCapabilityInternal(TW_IDENTITY & srcID,
+                              TW_UINT16 cap,
+                              Capability & capability);
 
    /**
     * g_pDSM_Entry holds the address of function DSM_Entry() in TWAIN_32.DLL. If
@@ -113,8 +204,8 @@ private:
     */
    static TW_IDENTITY twainAppID;
 
-   int brightness;
-   int contrast;
+   Capability supportedDpis;
+
    int errorCode;
 };
 

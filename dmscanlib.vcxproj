@@ -220,9 +220,6 @@
     <ClCompile Include="src\jni\DmScanLibJniCommon.cpp" />
     <ClCompile Include="src\jni\DmScanLibJniWin32.cpp" />
     <ClCompile Include="src\DmScanLibWin32.cpp" />
-    <ClCompile Include="src\test\ImageInfo.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDLL|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="src\test\TestCommon.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDLL|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug-DLL|Win32'">true</ExcludedFromBuild>
@@ -266,8 +263,8 @@
     <ClInclude Include="src\geometryWindows.h" />
     <ClInclude Include="src\Image.h" />
     <ClInclude Include="src\imgscanner\ImgScanner.h" />
-    <ClInclude Include="src\imgscanner\ImgScannerTwain.h" />
     <ClInclude Include="src\imgscanner\ImgScannerSimulator.h" />
+    <ClInclude Include="src\imgscanner\ImgScannerTwain.h" />
     <ClInclude Include="src\jni\DmScanLibJni.h" />
     <ClInclude Include="src\jni\DmScanLibJniInternal.h" />
     <ClInclude Include="src\nvwa\bool_array.h" />

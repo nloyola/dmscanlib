@@ -85,10 +85,10 @@ JNIEXPORT jobject JNICALL Java_org_biobank_platedecoder_dmscanlib_ScanLib_scanIm
    jlong _dpi,
    jint _brightness,
    jint _contrast,
-   jdouble x,
-   jdouble y,
-   jdouble width,
-   jdouble height,
+   jdouble left,
+   jdouble top,
+   jdouble right,
+   jdouble bottom,
    jstring _filename) {
 
    if ((_dpi == 0)	|| (_filename == 0)) {
@@ -103,13 +103,14 @@ JNIEXPORT jobject JNICALL Java_org_biobank_platedecoder_dmscanlib_ScanLib_scanIm
 
    dmscanlib::DmScanLib dmScanLib(verbose);
    int result = dmScanLib.scanImage(
+	   "",
       dpi,
       brightness,
       contrast,
-      static_cast<float>(x),
-      static_cast<float>(y),
-      static_cast<float>(width),
-      static_cast<float>(height),
+      static_cast<float>(left),
+      static_cast<float>(top),
+      static_cast<float>(right),
+      static_cast<float>(bottom),
       filename);
    jobject resultObj = dmscanlib::jni::createScanResultObject(env, result, result);
    env->ReleaseStringUTFChars(_filename, filename);
@@ -136,7 +137,7 @@ JNIEXPORT jobject JNICALL Java_org_biobank_platedecoder_dmscanlib_ScanLib_scanFl
    const char *filename = env->GetStringUTFChars(_filename, 0);
 
    dmscanlib::DmScanLib dmScanLib(verbose);
-   int result = dmScanLib.scanFlatbed(dpi, brightness, contrast, filename);
+   int result = dmScanLib.scanFlatbed("", dpi, brightness, contrast, filename);
    jobject resultObj = dmscanlib::jni::createScanResultObject(env, result, result);
    env->ReleaseStringUTFChars(_filename, filename);
    return resultObj;
@@ -149,10 +150,10 @@ JNIEXPORT jobject JNICALL Java_org_biobank_platedecoder_dmscanlib_ScanLib_scanAn
    jlong _dpi,
    jint _brightness,
    jint _contrast,
-   jdouble x,
-   jdouble y,
-   jdouble width,
-   jdouble height,
+   jdouble left,
+   jdouble top,
+   jdouble right,
+   jdouble bottom,
    jobject _decodeOptions,
    jobjectArray _wellRects) {
 
@@ -183,13 +184,14 @@ JNIEXPORT jobject JNICALL Java_org_biobank_platedecoder_dmscanlib_ScanLib_scanAn
 
    dmscanlib::DmScanLib dmScanLib(0);
    result = dmScanLib.scanAndDecode(
+	   "",
       dpi,
       brightness,
       contrast,
-      static_cast<float>(x),
-      static_cast<float>(y),
-      static_cast<float>(width),
-      static_cast<float>(height),
+      static_cast<float>(left),
+      static_cast<float>(top),
+      static_cast<float>(right),
+      static_cast<float>(bottom),
       *decodeOptions,
       wellRects);
 

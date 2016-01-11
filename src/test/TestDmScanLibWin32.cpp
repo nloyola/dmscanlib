@@ -43,9 +43,7 @@ TEST(TestDmScanLibWin32, getScannerCapability) {
    int result = dmScanLib.getScannerCapability();
 
    ASSERT_EQ(CAP_IS_WIA, result & CAP_IS_WIA);
-   ASSERT_EQ(CAP_DPI_300, result & CAP_DPI_300);
-   ASSERT_EQ(CAP_DPI_400, result & CAP_DPI_400);
-   ASSERT_EQ(CAP_DPI_600, result & CAP_DPI_600);
+   ASSERT_EQ(CAP_IS_SCANNER, result & CAP_IS_SCANNER);
 }
 
 } /* namespace */
