@@ -21,7 +21,7 @@ Image::Image(const std::string & _filename) : filename(_filename)
    valid = (image.data != NULL);
 
    if (valid) {
-      VLOG(1) << "Image::Image: width: " << image.cols
+      VLOG(3) << "Image::Image: width: " << image.cols
               << ", height: " << image.rows
               << ", depth: " << image.elemSize()
               << ", step: " << image.step1();
@@ -94,7 +94,7 @@ Image::Image(HANDLE h) : filename(""), handle(h) {
       IPL_DEPTH_8U,
       channels);
 
-   CHECK_NE(cv_image, static_cast<IplImage*>(NULL)) << "invalid image type";
+   CHECK(cv_image != NULL)) << "invalid image type";
 
    cvSetData(cv_image, pixels, cv_image->widthStep);
    cv::flip(cv::Mat(cv_image), image, 0);
@@ -178,7 +178,7 @@ void Image::drawLine(const cv::Point & pt1, const cv::Point & pt2, const cv::Sca
 }
 
 int Image::write(const std::string & filename) const {
-   VLOG(1) << "write: " << filename;
+   VLOG(3) << "write: " << filename;
    IplImage saveImage = image;
    int result = cvSaveImage(filename.c_str(), &saveImage);
    return result;

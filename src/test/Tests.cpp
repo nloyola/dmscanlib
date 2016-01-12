@@ -29,12 +29,15 @@
 #define _CRT_SECURE_NO_DEPRECATE
 
 #include "DmScanLib.h"
-#include "test/testCommon.h"
+#include "test/TestCommon.h"
 
 #include <gtest/gtest.h>
 
 int main(int argc, char **argv) {
    ::testing::InitGoogleTest(&argc, argv);
+
+   dmscanlib::test::getFirstDevice();
+
    dmscanlib::test::initializeTwain();
    dmscanlib::DmScanLib::configLogging(1, false);
    int result = RUN_ALL_TESTS();

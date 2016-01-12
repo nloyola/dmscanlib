@@ -1,5 +1,5 @@
 imageFilename="testImages/8x12/thermo_pallet.bmp"
-boundingBox = { x = 0; y = 0; width = 2511; height = 1720; }
+boundingBox = { x = 0; y = 0; width = 2510; height = 1719; }
 palletSize = { rows = 8; columns=12; }
 orientation="landscape"
 barcodePosition="bottom"

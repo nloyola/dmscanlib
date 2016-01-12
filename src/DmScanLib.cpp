@@ -145,7 +145,7 @@ int DmScanLib::scanFlatbed(const char * const deviceName,
            << ", contrast:" << contrast
            << ", filename:" << filename;
 
-   CHECK_NE(filename, static_cast<const char * const>(NULL)) << "filename is null";
+   CHECK(filename != NULL) << "filename is null";
 
    imgScanner->selectDevice(deviceName);
    std::unique_ptr<Image> image = imgScanner->acquireFlatbed(dpi, brightness, contrast);

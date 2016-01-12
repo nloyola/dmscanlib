@@ -49,7 +49,7 @@ ImgScannerSane::~ImgScannerSane() {
 }
 
 void ImgScannerSane::init() {
-   VLOG(2) << "init:";
+   VLOG(5) << "init:";
 
    deviceName.clear();
    saneOptions.clear();
@@ -113,9 +113,10 @@ void ImgScannerSane::getDeviceNames(std::vector<std::string> & names) {
 
    unsigned i = 0;
    const SANE_Device * deviceList = deviceListPtr[i];
+
    while (deviceList != NULL) {
       names.push_back(deviceList->name);
-      VLOG(5) << "name: " << deviceList->name
+      VLOG(3) << "name: " << deviceList->name
               << ", vendor: " << deviceList->vendor
               << ", model: " << deviceList->model
               << ", type: " << deviceList->type;
@@ -333,6 +334,9 @@ std::unique_ptr<Image> ImgScannerSane::acquireImageInternal(unsigned dpi,
 
    CHECK(bottomOpt->validValue(top)) << "bounding box exeeds flatbed dimensions";
    CHECK(bottomOpt->validValue(bottom)) << "bounding box exeeds flatbed dimensions";
+
+   CHECK_GT(right, left) << "bounding box exeeds flatbed dimensions";
+   CHECK_GT(bottom, top) << "bounding box exeeds flatbed dimensions";
 
    errorCode = SC_SUCCESS;
 

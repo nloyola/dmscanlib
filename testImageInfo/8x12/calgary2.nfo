@@ -1,5 +1,5 @@
 imageFilename="testImages/8x12/calgary2.bmp"
-boundingBox = { x = 54; y = 87; width = 2499; height = 1680; }
+boundingBox = { x = 54; y = 87; width = 2510; height = 1670; }
 palletSize = { rows = 8; columns=12; }
 orientation="landscape"
 barcodePosition="bottom"

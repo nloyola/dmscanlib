@@ -1,5 +1,5 @@
 imageFilename="testImages/8x12/iced_images/scanned_ice4.bmp"
-boundingBox = { x = 96; y = 110; width = 2496; height = 1670; }
+boundingBox = { x = 96; y = 110; width = 2486; height = 1660; }
 palletSize = { rows = 8; columns=12; }
 orientation="landscape"
 barcodePosition="bottom"

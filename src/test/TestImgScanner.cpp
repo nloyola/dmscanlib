@@ -26,10 +26,7 @@ std::unique_ptr<ImgScanner> selectSourceAsDefault() {
    std::unique_ptr<ImgScanner> imgScanner = ImgScanner::create();
 
 #ifndef WIN32
-   std::vector<std::string> deviceNames;
-   imgScanner->getDeviceNames(deviceNames);
-   CHECK_EQ(1, deviceNames.size());
-   imgScanner->selectDevice(deviceNames[0]);
+   imgScanner->selectDevice(test::getFirstDevice());
 #endif
 
    return imgScanner;
@@ -44,7 +41,7 @@ TEST(TestImgScanner, getCapability) {
 TEST(TestImgScanner, acquireFlatbed) {
    unsigned dpi = 75;
 
-   FLAGS_v = 3;
+   FLAGS_v = 0;
    std::unique_ptr<ImgScanner> imgScanner = selectSourceAsDefault();
 
    std::pair<float, float> flatbedDimensions;
@@ -62,8 +59,8 @@ TEST(TestImgScanner, acquireFlatbed) {
    int expectedHeight = static_cast<int>(static_cast<float>(dpi * flatbedDimensions.second));
 
    // SANE driver does not generate exact dimensions for image
-   EXPECT_EQ(expectedWidth, image->getWidth());
-   EXPECT_EQ(expectedHeight, image->getHeight());
+   EXPECT_LE(abs(expectedWidth - image->getWidth()), IMAGE_PIXELS_THRESHOLD);
+   EXPECT_LE(abs(expectedHeight - image->getHeight()), IMAGE_PIXELS_THRESHOLD);
 }
 
 TEST(TestImgScanner, acquireImage) {
@@ -73,7 +70,7 @@ TEST(TestImgScanner, acquireImage) {
    float right = 3.0;
    float bottom = 2.0;
 
-   FLAGS_v = 3;
+   FLAGS_v = 0;
 
    std::unique_ptr<ImgScanner> imgScanner = selectSourceAsDefault();
    std::unique_ptr<Image> image =
@@ -88,9 +85,8 @@ TEST(TestImgScanner, acquireImage) {
    int expectedWidth = static_cast<int>(static_cast<float>(dpi * (right - left)));
    int expectedHeight = static_cast<int>(static_cast<float>(dpi * (bottom - top)));
 
-   // SANE driver does not generate exact dimensions for image
-   EXPECT_EQ(expectedWidth, image->getWidth());
-   EXPECT_EQ(expectedHeight, image->getHeight());
+   EXPECT_LE(abs(expectedWidth - image->getWidth()), IMAGE_PIXELS_THRESHOLD);
+   EXPECT_LE(abs(expectedHeight - image->getHeight()), IMAGE_PIXELS_THRESHOLD);
 }
 
 TEST(TestImgScanner, acquireImageBadBrightness) {
@@ -122,7 +118,7 @@ TEST(TestImgScanner, acquireImageBadContrast) {
    float right = 3.0;
    float bottom = 1.0;
 
-   FLAGS_v = 3;
+   FLAGS_v = 0;
    std::pair<int, int> contrastRange;
    std::unique_ptr<ImgScanner> imgScanner = selectSourceAsDefault();
 

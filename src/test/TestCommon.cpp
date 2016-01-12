@@ -57,19 +57,25 @@ void initializeTwain() {
 #endif
 }
 
-std::string getFirstDevice() {
-   std::string result;
+// calling imgScanner::getDeviceNames() multiple times results in sometimes
+// SANE not returning any device names.
+//
+// by implementing getFirstDevice() this way we avoid this problem.
+static std::string firstDeviceName;
 
+std::string & getFirstDevice() {
 #ifndef WIN32
-   std::unique_ptr<ImgScanner> imgScanner = ImgScanner::create();
-   std::vector<std::string> deviceNames;
-   imgScanner->getDeviceNames(deviceNames);
-   CHECK_GT(deviceNames.size(), 0);
-   imgScanner->selectDevice(deviceNames[0]);
-   result.append(deviceNames[0]);
+   if (firstDeviceName.empty()) {
+      std::unique_ptr<ImgScanner> imgScanner = ImgScanner::create();
+      std::vector<std::string> deviceNames;
+      imgScanner->getDeviceNames(deviceNames);
+      CHECK_GT(deviceNames.size(), 0);
+      imgScanner->selectDevice(deviceNames[0]);
+      firstDeviceName.append(deviceNames[0]);
+   }
 #endif
 
-   return result;
+   return firstDeviceName;
 }
 
 /*
@@ -189,8 +195,21 @@ void getWellRectsForBoundingBox(const cv::Rect & bbox,
                             cellSize.height));
             const cv::Rect & wRect = wellRect->getRectangle();
 
-            CHECK(bbox.contains(wRect.tl())) << "well rectangle top-left outside image: " << label;
-            CHECK(bbox.contains(wRect.br())) << "well rectangle bottom-right outside image: " << label;
+            if (!bbox.contains(wRect.tl())) {
+               LOG(WARNING) << "well rectangle top-left outside bounding box: "
+                            << label
+                            << ", " << wRect.tl();
+               wellRects.clear();
+               return;
+            }
+
+            if (!bbox.contains(wRect.br())) {
+               LOG(WARNING) << "well rectangle bottom-right outside bounding box: "
+                            << label
+                            << ", " << wRect.br();
+               wellRects.clear();
+               return;
+            }
 
             VLOG(5) << "getWellRectsForBoundingBox: " << *wellRect;
             wellRects.push_back(std::move(wellRect));
@@ -202,10 +221,10 @@ void getWellRectsForBoundingBox(const cv::Rect & bbox,
 }
 
 std::unique_ptr<DecodeOptions> getDefaultDecodeOptions() {
-    const double minEdgeFactor = 0.2;
+    const double minEdgeFactor = 0.15;
     const double maxEdgeFactor = 0.3;
     const double scanGapFactor = 0.1;
-    const long squareDev = 15;
+    const long squareDev = 10;
     const long edgeThresh = 5;
     const long corrections = 10;
     const long shrink = 1;

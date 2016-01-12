@@ -1,5 +1,5 @@
 imageFilename="testImages/8x12/edge_tubes.bmp"
-boundingBox = { x = 0; y = 0; width = 1656; height = 1105; }
+boundingBox = { x = 0; y = 0; width = 1653; height = 1103; }
 palletSize = { rows = 8; columns=12; }
 orientation="landscape"
 barcodePosition="bottom"

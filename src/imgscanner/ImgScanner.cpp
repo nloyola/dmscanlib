@@ -27,7 +27,9 @@ std::unique_ptr<ImgScanner> ImgScanner::create() {
 }
 
 void ImgScanner::setTwainDsmEntry(DSMENTRYPROC twainDsmEntry) {
+#ifdef WIN32
    imgscanner::ImgScannerTwain::setTwainDsmEntry(twainDsmEntry);
+#endif
 }
 
 

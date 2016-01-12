@@ -8,20 +8,9 @@
 #define _CRT_SECURE_NO_DEPRECATE
 
 #include "DmScanLib.h"
-#include "Image.h"
 #include "decoder/Decoder.h"
 #include "decoder/WellDecoder.h"
 #include "test/TestCommon.h"
-#include "decoder/DmtxDecodeHelper.h"
-#include "utils/DmTime.h"
-
-#include <dmtx.h>
-#include <algorithm>
-#include <opencv/cv.h>
-#include <stdexcept>
-#include <stddef.h>
-#include <sys/types.h>
-#include <fstream>
 
 #define GLOG_NO_ABBREVIATED_SEVERITIES
 #include <glog/logging.h>
@@ -31,11 +20,7 @@ using namespace dmscanlib;
 
 namespace {
 
-#ifdef WIN32
-static const bool WIA_MODE = true;
-#else
-static const bool WIA_MODE = false;
-#endif
+int IMAGE_PIXELS_THRESHOLD = 5;
 
 /**
  * Do not care if call to delete file fails.
@@ -49,8 +34,19 @@ void deleteFile(const std::string & filename) {
 #endif
 }
 
+TEST(TestDmScanLib, selectSourceAsDefault) {
+    FLAGS_v = 1;
+    DmScanLib dmScanLib(1);
+
+#ifdef WIN32
+    ASSERT_EQ(SC_SUCCESS, dmScanLib.selectSourceAsDefault());
+#else
+    ASSERT_EQ(SC_FAIL, dmScanLib.selectSourceAsDefault());
+#endif
+}
+
 TEST(TestDmScanLib, scanImage) {
-   FLAGS_v = 3;
+   FLAGS_v = 1;
 
    const unsigned dpi = 300;
    float x = 0.400f;
@@ -68,19 +64,22 @@ TEST(TestDmScanLib, scanImage) {
                                     0,
                                     x,
                                     y,
-                                    WIA_MODE ? width : x + width,
-                                    WIA_MODE ? height : y + height,
+                                    x + width,
+                                    y + height,
                                     fname.c_str());
 
    EXPECT_EQ(SC_SUCCESS, result);
    Image image(fname.c_str());
 
-   EXPECT_EQ(static_cast<unsigned>(width * dpi), image.getWidth());
-   EXPECT_EQ(static_cast<unsigned>(height * dpi), image.getHeight());
+   int expectedWidth = static_cast<int>(static_cast<float>(width * dpi));
+   int expectedHeight = static_cast<int>(static_cast<float>(height * dpi));
+
+   ASSERT_LE(abs(expectedWidth - image.getWidth()), IMAGE_PIXELS_THRESHOLD);
+   ASSERT_LE(abs(expectedHeight - image.getHeight()), IMAGE_PIXELS_THRESHOLD);
 }
 
 TEST(TestDmScanLib, scanImageBadParams) {
-   FLAGS_v = 3;
+   FLAGS_v = 1;
 
    DmScanLib dmScanLib(1);
    EXPECT_DEATH(dmScanLib.scanImage(test::getFirstDevice().c_str(),
@@ -96,7 +95,7 @@ TEST(TestDmScanLib, scanImageBadParams) {
 }
 
 TEST(TestDmScanLib, scanImageInvalidDpi) {
-   FLAGS_v = 3;
+   FLAGS_v = 1;
 
    DmScanLib dmScanLib(1);
    std::string fname("tmpscan.png");
@@ -114,12 +113,12 @@ TEST(TestDmScanLib, scanImageInvalidDpi) {
 }
 
 TEST(TestDmScanLib, scanFlatbed) {
-   FLAGS_v = 3;
+   FLAGS_v = 1;
 
    std::string fname("flatbed.png");
    deleteFile(fname);
 
-   const unsigned dpi = 300;
+   const unsigned dpi = 75;
    DmScanLib dmScanLib(1);
    int result = dmScanLib.scanFlatbed(test::getFirstDevice().c_str(),
                                       dpi,
@@ -133,19 +132,22 @@ TEST(TestDmScanLib, scanFlatbed) {
    std::pair<float, float> dimensions;
    dmScanLib.getFlatbedDimensions(dimensions);
 
-   EXPECT_EQ(static_cast<unsigned>(dimensions.first * dpi), image.getWidth());
-   EXPECT_EQ(static_cast<unsigned>(dimensions.second * dpi), image.getHeight());
+   int expectedWidth = static_cast<int>(static_cast<float>(dimensions.first * dpi));
+   int expectedHeight = static_cast<int>(static_cast<float>(dimensions.second * dpi));
+
+   ASSERT_LE(abs(expectedWidth - image.getWidth()), IMAGE_PIXELS_THRESHOLD);
+   ASSERT_LE(abs(expectedHeight - image.getHeight()), IMAGE_PIXELS_THRESHOLD);
 }
 
 TEST(TestDmScanLib, scanFlatbedBadParams) {
-   FLAGS_v = 3;
+   FLAGS_v = 1;
 
    std::string fname("flatbed.png");
    deleteFile(fname);
 
    DmScanLib dmScanLib(1);
    EXPECT_DEATH(dmScanLib.scanFlatbed(test::getFirstDevice().c_str(),
-                                      300,
+                                      75,
                                       0,
                                       0,
                                       NULL),
@@ -215,11 +217,12 @@ TEST(TestDmScanLib, scanAndDecode) {
 TEST(TestDmScanLib, scanAndDecodeMultiple) {
    FLAGS_v = 1;
 
-   const unsigned dpi = 600;
+   const unsigned dpi = 300;
    float left = 0.400f;
    float top = 0.265f;
    float width = 4.225f;
    float height = 2.8f;
+   std::string firstDevice = test::getFirstDevice();
    std::unique_ptr<DecodeOptions> decodeOptions = test::getDefaultDecodeOptions();
 
    // make the bounding box with and height one pixel less than the image
@@ -238,7 +241,7 @@ TEST(TestDmScanLib, scanAndDecodeMultiple) {
                                     wellRects);
 
    DmScanLib dmScanLib(1);
-   int result = dmScanLib.scanAndDecode(test::getFirstDevice().c_str(),
+   int result = dmScanLib.scanAndDecode(firstDevice.c_str(),
                                         dpi,
                                         0,
                                         0,
@@ -262,7 +265,7 @@ TEST(TestDmScanLib, scanAndDecodeMultiple) {
       lastResults[wellDecoder.getLabel()] = wellDecoder.getMessage();
    }
 
-   result = dmScanLib.scanAndDecode(test::getFirstDevice().c_str(),
+   result = dmScanLib.scanAndDecode(firstDevice.c_str(),
                                     dpi,
                                     0,
                                     0,

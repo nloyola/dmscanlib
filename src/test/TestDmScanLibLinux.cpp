@@ -9,9 +9,13 @@
 #include "DmScanLib.h"
 #include "test/TestCommon.h"
 #include "test/ImageInfo.h"
+#include "decoder/WellDecoder.h"
+#include "utils/DmTime.h"
+#include "Image.h"
 
 #include <glog/logging.h>
 #include <gtest/gtest.h>
+#include <fstream>
 
 using namespace dmscanlib;
 
@@ -55,33 +59,41 @@ std::unique_ptr<DecodeTestResult> decodeFromInfo(std::string & infoFilename,
    testResult->infoFileValid = imageInfo.isValid();
 
    if (testResult->infoFileValid) {
+      Image image(imageInfo.getImageFilename());
+
+      VLOG(1) << "image dimensions: width: " << image.getWidth()
+              << ", height: " << image.getHeight();
+
       testResult->totalTubes = imageInfo.getDecodedWellCount();
       std::vector<std::unique_ptr<const WellRectangle> > wellRects;
-      test::getWellRectsForBoundingBox(
-         imageInfo.getBoundingBox(),
-         imageInfo.getPalletRows(),
-         imageInfo.getPalletCols(),
-         imageInfo.getOrientation(),
-         imageInfo.getBarcodePosition(),
-         wellRects);
+      test::getWellRectsForBoundingBox(imageInfo.getBoundingBox(),
+                                       imageInfo.getPalletRows(),
+                                       imageInfo.getPalletCols(),
+                                       imageInfo.getOrientation(),
+                                       imageInfo.getBarcodePosition(),
+                                       wellRects);
 
-      util::DmTime start;
-      testResult->decodeResult = dmScanLib.decodeImageWells(
-         imageInfo.getImageFilename().c_str(),
-         decodeOptions,
-         wellRects);
-      util::DmTime end;
+      if (!wellRects.empty()) {
+         util::DmTime start;
+         testResult->decodeResult =
+            dmScanLib.decodeImageWells(imageInfo.getImageFilename().c_str(),
+                                       decodeOptions,
+                                       wellRects);
+         util::DmTime end;
 
-      testResult->decodeTime = end.difftime(start)->getTime();
+         testResult->decodeTime = end.difftime(start)->getTime();
 
-      if (testResult->decodeResult == SC_SUCCESS) {
+         if (testResult->decodeResult == SC_SUCCESS) {
          testResult->totalDecoded = dmScanLib.getDecodedWellCount();
          checkDecodeInfo(dmScanLib, imageInfo);
+         }
+      } else {
+         LOG(WARNING) << "well rectangles could not be determined";
+         testResult->decodeResult = SC_INVALID_NOTHING_DECODED;
       }
    }
 
    return testResult;
-
 }
 
 void writeAllDecodeResults(std::vector<std::string> & testResults, bool append = false) {
@@ -98,13 +110,7 @@ void writeAllDecodeResults(std::vector<std::string> & testResults, bool append =
    ofile.close();
 }
 
-TEST(TestDmScanLibLinux, selectSourceAsDefault) {
-    FLAGS_v = 3;
-    DmScanLib dmScanLib(1);
-    ASSERT_EQ(SC_SUCCESS, dmScanLib.selectSourceAsDefault());
-}
-
-TEST(TestDmScanLib, readInfoFiles) {
+TEST(TestDmScanLibLinux, readInfoFiles) {
    FLAGS_v = 1;
 
    std::string dirname("testImageInfo");
@@ -133,23 +139,23 @@ TEST(TestDmScanLibLinux, decodeFromInfo) {
    //std::string infoFilename("testImageInfo/8x12/calgary2.nfo");
    //std::string infoFilename("testImageInfo/8x12/new_tubes.nfo");
    //std::string infoFilename("testImageInfo/9x9/stanford_9x9_1.nfo");
-   std::string infoFilename("testImageInfo/8x12/FrozenPalletImages/HP_L1985A/scanned1_1.nfo");
+   //std::string infoFilename("testImageInfo/8x12/FrozenPalletImages/HP_L1985A/scanned1_1.nfo");
    //std::string infoFilename("testImageInfo/8x12/problem_tubes_portrait.nfo");
-
+   std::string infoFilename("testImageInfo/8x12/edge_tubes.nfo");
 
    std::unique_ptr<DecodeOptions> defaultDecodeOptions = test::getDefaultDecodeOptions();
-   DecodeOptions decodeOptions(
-      0.2,
-      0.4,
-      0.0,
-      defaultDecodeOptions->squareDev,
-      defaultDecodeOptions->edgeThresh,
-      defaultDecodeOptions->corrections,
-      defaultDecodeOptions->shrink);
+   DecodeOptions decodeOptions(0.2,
+                               0.4,
+                               0.0,
+                               defaultDecodeOptions->squareDev,
+                               defaultDecodeOptions->edgeThresh,
+                               defaultDecodeOptions->corrections,
+                               defaultDecodeOptions->shrink);
 
    DmScanLib dmScanLib(0);
-   std::unique_ptr<DecodeTestResult> testResult =
-      decodeFromInfo(infoFilename, decodeOptions, dmScanLib);
+   std::unique_ptr<DecodeTestResult> testResult = decodeFromInfo(infoFilename,
+                                                                 decodeOptions,
+                                                                 dmScanLib);
 
    EXPECT_TRUE(testResult->infoFileValid);
    EXPECT_EQ(SC_SUCCESS, testResult->decodeResult);
@@ -180,14 +186,13 @@ TEST(TestDmScanLibLinux, decodeAllImages) {
    double totalTime = 0;
    std::stringstream ss;
    std::unique_ptr<DecodeOptions> defaultDecodeOptions = test::getDefaultDecodeOptions();
-   DecodeOptions decodeOptions(
-      0.2,
-      0.4,
-      0.15,
-      defaultDecodeOptions->squareDev,
-      defaultDecodeOptions->edgeThresh,
-      defaultDecodeOptions->corrections,
-      defaultDecodeOptions->shrink);
+   DecodeOptions decodeOptions(0.15,
+                               0.3,
+                               0.1,
+                               defaultDecodeOptions->squareDev,
+                               defaultDecodeOptions->edgeThresh,
+                               defaultDecodeOptions->corrections,
+                               defaultDecodeOptions->shrink);
 
    for (unsigned i = 0, n = filenames.size(); i < n; ++i) {
       ss.str("");
@@ -261,14 +266,13 @@ TEST(TestDmScanLibLinux, DISABLED_decodeAllImagesAllParameters) {
 
             testResults.clear();
 
-            DecodeOptions decodeOptions(
-               minEdge,
-               maxEdge,
-               scanGap,
-               defaultDecodeOptions->squareDev,
-               defaultDecodeOptions->edgeThresh,
-               defaultDecodeOptions->corrections,
-               defaultDecodeOptions->shrink);
+            DecodeOptions decodeOptions(minEdge,
+                                        maxEdge,
+                                        scanGap,
+                                        defaultDecodeOptions->squareDev,
+                                        defaultDecodeOptions->edgeThresh,
+                                        defaultDecodeOptions->corrections,
+                                        defaultDecodeOptions->shrink);
 
             for (unsigned i = 0, n = filenames.size(); i < n; ++i) {
                ss.str("");

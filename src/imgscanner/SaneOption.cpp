@@ -175,8 +175,7 @@ SaneOptionFactory::createOption(const SANE_Handle saneHandle,
                                 const int optionNumber,
                                 const SaneOptionGroup * group) {
    const SANE_Option_Descriptor * optionDesc = sane_get_option_descriptor(saneHandle, optionNumber);
-   CHECK_NE(optionDesc, static_cast<const SANE_Option_Descriptor *>(NULL))
-            << "could not get option description for option " << optionNumber;
+   CHECK(optionDesc != NULL) << "could not get option description for option " << optionNumber;
 
    switch (optionDesc->type) {
       case SANE_TYPE_BOOL: {

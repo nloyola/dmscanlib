@@ -24,7 +24,7 @@ namespace test {
 
 void initializeTwain();
 
-std::string getFirstDevice();
+std::string & getFirstDevice();
 
 bool getTestImageInfoFilenames(std::string dir, std::vector<std::string> & filenames);
 
