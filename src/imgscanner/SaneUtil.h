@@ -29,6 +29,11 @@ public:
                                       SANE_Int    optNum,
                                       SANE_String str);
 
+   /**
+    * Converts a value from a range using linear correlation.
+    */
+   static int scaleValue(int value, int slopeRise, int slopeRun);
+
 };
 
 /* Local Variables: */

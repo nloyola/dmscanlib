@@ -73,6 +73,18 @@ int DmScanLib::selectSourceAsDefault() {
    return SC_FAIL;
 }
 
+void DmScanLib::getDeviceNames(std::vector<std::string> & names) {
+   imgScanner->getDeviceNames(names);
+}
+
+void DmScanLib::selectDevice(const char * const deviceName) {
+   imgScanner->selectDevice(deviceName);
+}
+
+void DmScanLib::getValidDpis(std::vector<int> & validDpis) {
+   imgScanner->getValidDpis(validDpis);
+}
+
 int DmScanLib::getScannerCapability() {
    return imgScanner->getScannerCapability();
 }

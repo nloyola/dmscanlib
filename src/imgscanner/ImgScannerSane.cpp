@@ -126,9 +126,25 @@ void ImgScannerSane::getDeviceNames(std::vector<std::string> & names) {
    sane_exit();
 }
 
-void ImgScannerSane::selectDevice(std::string const & name) {
-   init();
-   deviceName.append(name);
+void ImgScannerSane::selectDevice(const std::string & name) {
+   if (deviceName.compare(name) != 0) {
+      init();
+      deviceName.append(name);
+   }
+}
+
+void ImgScannerSane::getValidDpis(std::vector<int> & validDpis) {
+   VLOG(2) << "getValidDpis";
+
+   CHECK_GT(deviceName.length(), 0) << "no device selected";
+
+   if (saneOptions.empty()) {
+      getScannerCapability();
+   }
+
+   validDpis.clear();
+   const SaneOptionConstraint<int> * resolutionOpt = getOptionConstraintInt(resolutionOption);
+   resolutionOpt->copyItems(validDpis);
 }
 
 int ImgScannerSane::getScannerCapability() {
@@ -320,14 +336,17 @@ std::unique_ptr<Image> ImgScannerSane::acquireImageInternal(unsigned dpi,
       return std::unique_ptr<Image>{};
    }
 
-   SaneOptionRangeConstraint<int> const * brightnessOpt = getOptionRangeInt(brightnessOption);
-   SaneOptionRangeConstraint<int> const * contrastOpt = getOptionRangeInt(contrastOption);
+   const SaneOptionRangeConstraint<int> * brightnessOpt = getOptionRangeInt(brightnessOption);
+   const SaneOptionRangeConstraint<int> * contrastOpt = getOptionRangeInt(contrastOption);
 
-   CHECK(brightnessOpt->validValue(brightness)) << "brightness value is not valid: " << brightness ;
-   CHECK(contrastOpt->validValue(contrast)) << "contrast value is not valid: " << contrast ;
+   int scaledBrightness = SaneUtil::scaleValue(brightness, 1000, brightnessOpt->getMax());
+   int scaledContrast = SaneUtil::scaleValue(contrast, 1000, contrastOpt->getMax());
 
-   SaneOptionRangeConstraint<double> const * rightOpt = getOptionRangeDouble(geometryRightOption);
-   SaneOptionRangeConstraint<double> const * bottomOpt = getOptionRangeDouble(geometryBottomOption);
+   CHECK(brightnessOpt->validValue(scaledBrightness)) << "brightness value is not valid: " << brightness ;
+   CHECK(contrastOpt->validValue(scaledContrast)) << "contrast value is not valid: " << contrast ;
+
+   const SaneOptionRangeConstraint<double> * rightOpt = getOptionRangeDouble(geometryRightOption);
+   const SaneOptionRangeConstraint<double> * bottomOpt = getOptionRangeDouble(geometryBottomOption);
 
    CHECK(rightOpt->validValue(left)) << "bounding box exeeds flatbed dimensions";
    CHECK(rightOpt->validValue(right)) << "bounding box exeeds flatbed dimensions";

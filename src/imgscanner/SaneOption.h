@@ -84,6 +84,10 @@ public:
       return (std::find(items.begin(), items.end(), item) != items.end());
    }
 
+   void copyItems(std::vector<T> & toVector) const {
+      toVector = items;
+   }
+
 private:
    std::vector<T> items;
 };

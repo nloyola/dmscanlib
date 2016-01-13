@@ -33,16 +33,17 @@ namespace dmscanlib {
 /**
  * Return codes used by the DLL API.
  */
-const int SC_SUCCESS = 0;
-const int SC_FAIL = -1;
-const int SC_TWAIN_UNAVAIL = -2;
-const int SC_INVALID_DPI = -3;
-const int SC_INVALID_NOTHING_DECODED = -4;
-const int SC_INVALID_IMAGE = -5;
+const int SC_SUCCESS                   =  0;
+const int SC_FAIL                      = -1;
+const int SC_TWAIN_UNAVAIL             = -2;
+const int SC_INVALID_DPI               = -3;
+const int SC_INVALID_NOTHING_DECODED   = -4;
+const int SC_INVALID_IMAGE             = -5;
 const int SC_INVALID_NOTHING_TO_DECODE = -6;
-const int SC_INCORRECT_DPI_SCANNED = -7;
+const int SC_INCORRECT_DPI_SCANNED     = -7;
+const int SC_INVALID_DEVICE            = -8;
 
-const unsigned CAP_IS_WIA = 0x01;
+const unsigned CAP_IS_WIA     = 0x01;
 const unsigned CAP_IS_SCANNER = 0x02;
 
 class Image;
@@ -65,7 +66,13 @@ public:
 
    int selectSourceAsDefault();
 
+   void getDeviceNames(std::vector<std::string> & names);
+
+   void selectDevice(const char * const deviceName);
+
    int getScannerCapability();
+
+   void getValidDpis(std::vector<int> & validDpis);
 
    void getFlatbedDimensions(std::pair<float, float> & dimensions);
 

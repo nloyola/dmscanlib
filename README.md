@@ -49,8 +49,8 @@ the C header file use the following commands:
 
 ```bash
 cd to <platedecoder_proj>/bin
-javah -jni org.biobank.platedecoder.dmscanlib.ScanLib
-mv org_biobank_platedecoder_dmscanlib_ScanLib.h <dmscanlib_proj>/src/jni/DmScanLibJni.h
+javah -jni org.biobank.dmscanlib.ScanLib
+mv org_biobank_dmscanlib_ScanLib.h <dmscanlib_proj>/src/jni/DmScanLibJni.h
 ```
 
 Where **platedecoder_proj** is the Java project used by Biobank.

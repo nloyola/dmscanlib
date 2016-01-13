@@ -56,7 +56,9 @@ public:
 
    virtual void getDeviceNames(std::vector<std::string> & names) = 0;
 
-   virtual void selectDevice(std::string const & name) = 0;
+   virtual void selectDevice(const std::string & name) = 0;
+
+   virtual void getValidDpis(std::vector<int> & validDpis) = 0;
 
    virtual int getScannerCapability() = 0;
 

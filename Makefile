@@ -17,8 +17,7 @@ JAVA_HOME := /usr/lib/jvm/java-8-oracle
 
 SRCS := \
 	src/DmScanLib.cpp \
-	src/jni/DmScanLibJniLinux.cpp \
-	src/jni/DmScanLibJniCommon.cpp \
+	src/jni/DmScanLibJni.cpp \
 	src/decoder/DecodeOptions.cpp \
 	src/decoder/Decoder.cpp \
 	src/decoder/DmtxDecodeHelper.cpp \

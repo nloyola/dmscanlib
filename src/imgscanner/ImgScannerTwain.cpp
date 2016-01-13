@@ -117,6 +117,10 @@ bool ImgScannerTwain::selectSourceAsDefault() {
    return true;
 }
 
+void ImgScannerTwain::getValidDpis(std::vector<int> & validDpis) {
+   CHECK(false) << "implement this method";
+}
+
 /* Assuming x-y resolution are the same*/
 int ImgScannerTwain::getScannerCapability() {
    TW_IDENTITY srcID;
@@ -137,7 +141,7 @@ void ImgScannerTwain::getDeviceNames(std::vector<std::string> & names) {
    // do nothing - only used in Linux
 }
 
-void ImgScannerTwain::selectDevice(std::string const & name) {
+void ImgScannerTwain::selectDevice(const std::string & name) {
    // do nothing - only used in Linux
 }
 

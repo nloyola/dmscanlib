@@ -31,7 +31,7 @@
 
 #define NOMINMAX
 #include <windows.h>
-#include <twain.h> 
+#include <twain.h>
 
 #define GLOG_NO_ABBREVIATED_SEVERITIES
 #include <glog/logging.h>
@@ -70,13 +70,13 @@ const char * TWAIN_DLL_FILENAME = "TWAIN_32.DLL";
  * g_AppID serves as a TWAIN identity structure that uniquely identifies the
  * application process responsible for making calls to function DSM_Entry().
  */
-static TW_IDENTITY g_AppID = { 
-	0, 
-	{ 1, 0, TWLG_ENGLISH_USA, TWCY_USA, "dmscanlib 1.0" }, 
-	TWON_PROTOCOLMAJOR, TWON_PROTOCOLMINOR, DG_CONTROL | DG_IMAGE, 
-	"Canadian Biosample Repository",
-	"Image acquisition library", 
-	"dmscanlib", 
+static TW_IDENTITY g_AppID = {
+   0,
+   { 1, 0, TWLG_ENGLISH_USA, TWCY_USA, "dmscanlib 1.0" },
+   TWON_PROTOCOLMAJOR, TWON_PROTOCOLMINOR, DG_CONTROL | DG_IMAGE,
+   "Canadian Biosample Repository",
+   "Image acquisition library",
+   "dmscanlib",
 };
 
 /**
@@ -118,39 +118,39 @@ static TW_IDENTITY g_AppID = {
  */
 BOOL WINAPI DllMain (HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
    if (fdwReason == DLL_PROCESS_ATTACH) {
-       // Save instance handle for later access in other functions.
-       g_hinstDLL = hinstDLL;
-       g_hLib = LoadLibraryA(TWAIN_DLL_FILENAME);
+      // Save instance handle for later access in other functions.
+      g_hinstDLL = hinstDLL;
+      g_hLib = LoadLibraryA(TWAIN_DLL_FILENAME);
 
-       // Report failure if TWAIN_32.DLL cannot be loaded and terminate
-       if (g_hLib == 0) {
-           MessageBoxA(0, "Unable to open TWAIN_32.DLL", "DmScanLib", MB_OK);
-           return FALSE;
-       }
+      // Report failure if TWAIN_32.DLL cannot be loaded and terminate
+      if (g_hLib == 0) {
+         MessageBoxA(0, "Unable to open TWAIN_32.DLL", "DmScanLib", MB_OK);
+         return FALSE;
+      }
 
-       // Attempt to retrieve DSM_Entry() function address.
-	   g_pDSM_Entry =  (DSMENTRYPROC) GetProcAddress(g_hLib, "DSM_Entry");
-       dmscanlib::imgscanner::ImgScannerTwain::setTwainDsmEntry(g_pDSM_Entry);
+      // Attempt to retrieve DSM_Entry() function address.
+      g_pDSM_Entry =  (DSMENTRYPROC) GetProcAddress(g_hLib, "DSM_Entry");
+      dmscanlib::imgscanner::ImgScannerTwain::setTwainDsmEntry(g_pDSM_Entry);
 
-       // Report failure if DSM_Entry() function not found in TWAIN_32.DLL
-       // and terminate 
-       if (g_pDSM_Entry == 0) {
-           MessageBoxA(0, "Unable to fetch DSM_Entry address", "DmScanLib", MB_OK);
-           return FALSE;
-       }
+      // Report failure if DSM_Entry() function not found in TWAIN_32.DLL
+      // and terminate
+      if (g_pDSM_Entry == 0) {
+         MessageBoxA(0, "Unable to fetch DSM_Entry address", "DmScanLib", MB_OK);
+         return FALSE;
+      }
 
 #ifdef _DEBUG
-	   dmscanlib::DmScanLib::configLogging(2, false);
-	   VLOG(1) << "DllMain: process attach";
+      dmscanlib::DmScanLib::configLogging(2, false);
+      VLOG(1) << "DllMain: process attach";
 #endif
    } else if (fdwReason == DLL_PROCESS_DETACH) {
-       // If the TWAIN_32.DLL library was loaded, remove it from memory.
-       if (g_hLib != 0) {
-           FreeLibrary (g_hLib);
+      // If the TWAIN_32.DLL library was loaded, remove it from memory.
+      if (g_hLib != 0) {
+         FreeLibrary (g_hLib);
 #ifdef _DEBUG
-		   VLOG(1) << "DllMain: process detach";
+         VLOG(1) << "DllMain: process detach";
 #endif
-	   }
+      }
    }
 
    return TRUE;

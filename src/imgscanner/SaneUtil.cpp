@@ -94,3 +94,8 @@ void SaneUtil::setControlOptionString(SANE_Handle saneHandle,
       << "could not set value for option: " << optNum
       << ", status: " << status;
 }
+
+int SaneUtil::scaleValue(int value, int slopeRise, int slopeRun) {
+   double slope = static_cast<double>(slopeRise) / static_cast<double>(slopeRun);
+   return static_cast<int>(slope * value);
+}

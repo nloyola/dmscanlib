@@ -125,7 +125,9 @@ public:
 
    void getDeviceNames(std::vector<std::string> & names);
 
-   void selectDevice(std::string const & name);
+   void selectDevice(const std::string & name);
+
+   void getValidDpis(std::vector<int> & validDpis);
 
    void getFlatbedDimensionsInInches(std::pair<float, float> & dimensions);
 
