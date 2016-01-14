@@ -94,7 +94,7 @@ Image::Image(HANDLE h) : filename(""), handle(h) {
       IPL_DEPTH_8U,
       channels);
 
-   CHECK(cv_image != NULL)) << "invalid image type";
+   CHECK(cv_image != NULL) << "invalid image type";
 
    cvSetData(cv_image, pixels, cv_image->widthStep);
    cv::flip(cv::Mat(cv_image), image, 0);

@@ -113,7 +113,20 @@ bool ImgScannerTwain::selectSourceAsDefault() {
 }
 
 void ImgScannerTwain::getValidDpis(std::vector<int> & validDpis) {
-   CHECK(false) << "implement this method";
+   TW_IDENTITY srcID;
+   HWND hwnd;
+
+   CHECK(scannerSourceInit(hwnd, srcID)) << "could not initialize source";
+
+   getScannerCapabilityInternal(srcID);
+   scannerSourceDeinit(hwnd, srcID);
+
+   validDpis.clear();
+   if (!supportedDpis.values.empty()) {
+      for (double & dpi : supportedDpis.values) {
+         validDpis.push_back(static_cast<int>(dpi));
+      }
+   }
 }
 
 /* Assuming x-y resolution are the same*/
@@ -225,7 +238,7 @@ std::unique_ptr<Image> ImgScannerTwain::acquireImage(unsigned dpi,
    if ((scannerCapability & CAP_IS_WIA) == CAP_IS_WIA) {
       // WIA drivers use a rectangle to define the scanning region,
       //
-      // i.e. the top left corner and a widht and height
+      // i.e. the top left corner and a width and height
       right -= left;
       bottom -= top;
    }

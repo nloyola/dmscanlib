@@ -217,8 +217,7 @@
     <ClCompile Include="src\Image.cpp" />
     <ClCompile Include="src\imgscanner\ImgScanner.cpp" />
     <ClCompile Include="src\imgscanner\ImgScannerTwain.cpp" />
-    <ClCompile Include="src\jni\DmScanLibJniCommon.cpp" />
-    <ClCompile Include="src\jni\DmScanLibJniWin32.cpp" />
+    <ClCompile Include="src\jni\DmScanLibJni.cpp" />
     <ClCompile Include="src\DmScanLibWin32.cpp" />
     <ClCompile Include="src\test\TestCommon.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDLL|Win32'">true</ExcludedFromBuild>
