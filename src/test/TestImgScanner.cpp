@@ -59,8 +59,8 @@ TEST(TestImgScanner, acquireFlatbed) {
    int expectedHeight = static_cast<int>(static_cast<float>(dpi * flatbedDimensions.second));
 
    // SANE driver does not generate exact dimensions for image
-   EXPECT_LE(abs(expectedWidth - image->getWidth()), IMAGE_PIXELS_THRESHOLD);
-   EXPECT_LE(abs(expectedHeight - image->getHeight()), IMAGE_PIXELS_THRESHOLD);
+   EXPECT_LE(abs(expectedWidth - image->getWidth()), test::IMAGE_PIXELS_THRESHOLD);
+   EXPECT_LE(abs(expectedHeight - image->getHeight()), test::IMAGE_PIXELS_THRESHOLD);
 }
 
 TEST(TestImgScanner, acquireImage) {
@@ -85,54 +85,50 @@ TEST(TestImgScanner, acquireImage) {
    int expectedWidth = static_cast<int>(static_cast<float>(dpi * (right - left)));
    int expectedHeight = static_cast<int>(static_cast<float>(dpi * (bottom - top)));
 
-   EXPECT_LE(abs(expectedWidth - image->getWidth()), IMAGE_PIXELS_THRESHOLD);
-   EXPECT_LE(abs(expectedHeight - image->getHeight()), IMAGE_PIXELS_THRESHOLD);
+   EXPECT_LE(abs(expectedWidth - image->getWidth()), test::IMAGE_PIXELS_THRESHOLD);
+   EXPECT_LE(abs(expectedHeight - image->getHeight()), test::IMAGE_PIXELS_THRESHOLD);
 }
 
 TEST(TestImgScanner, acquireImageBadBrightness) {
    float left = 1.0;
    float top = 1.0;
    float right = 3.0;
-   float bottom = 1.0;
+   float bottom = 2.0;
 
    FLAGS_v = 3;
    std::pair<int, int> brightnessRange;
    std::unique_ptr<ImgScanner> imgScanner = selectSourceAsDefault();
 
-   imgScanner->getBrightnessRange(brightnessRange);
+   int invalidBrightnessValues[2];
+   invalidBrightnessValues[0] = ImgScanner::MIN_BRIGHTNESS - 1;
+   invalidBrightnessValues[1] = ImgScanner::MAX_BRIGHTNESS + 1;
 
-   int badBrightness = brightnessRange.first -1;
-
-   EXPECT_DEATH(imgScanner->acquireImage(100, badBrightness, 0, left, top, right, bottom),
-                "brightness value is not valid: " + std::to_string(badBrightness));
-
-   badBrightness = brightnessRange.second +1;
-
-   EXPECT_DEATH(imgScanner->acquireImage(100, badBrightness, 0, left, top, right, bottom),
-                "brightness value is not valid: " + std::to_string(badBrightness));
+   for (const int &value : invalidBrightnessValues) {
+      EXPECT_DEATH(
+         imgScanner->acquireImage(100, value, 0, left, top, right, bottom),
+         "brightness value is not valid: " + std::to_string(value));
+   }
 }
 
 TEST(TestImgScanner, acquireImageBadContrast) {
    float left = 1.0;
    float top = 1.0;
    float right = 3.0;
-   float bottom = 1.0;
+   float bottom = 2.0;
 
    FLAGS_v = 0;
    std::pair<int, int> contrastRange;
    std::unique_ptr<ImgScanner> imgScanner = selectSourceAsDefault();
 
-   imgScanner->getContrastRange(contrastRange);
+   int invalidContrastValues[2];
+   invalidContrastValues[0] = ImgScanner::MIN_CONTRAST - 1;
+   invalidContrastValues[1] = ImgScanner::MAX_CONTRAST + 1;
 
-   int badContrast = contrastRange.first -1;
-
-   EXPECT_DEATH(imgScanner->acquireImage(100, 0, badContrast, left, top, right, bottom),
-                "contrast value is not valid: " + std::to_string(badContrast));
-
-   badContrast = contrastRange.second +1;
-
-   EXPECT_DEATH(imgScanner->acquireImage(100, 0, badContrast, left, top, right, bottom),
-                "contrast value is not valid: " + std::to_string(badContrast));
+   for (const int &value : invalidContrastValues) {
+      EXPECT_DEATH(
+         imgScanner->acquireImage(100, 0, value, left, top, right, bottom),
+         "contrast value is not valid: " + std::to_string(value));
+   }
 }
 
 TEST(TestImgScanner, acquireImageBadRegion) {
@@ -154,16 +150,11 @@ TEST(TestImgScanner, acquireImageBadRegion) {
    regions.push_back(
          cv::Rect_<float>(flatbedDimensions.first, flatbedDimensions.second, 1.0l, 1.0l));
 
-   for (std::vector<cv::Rect_<float>>::iterator it = regions.begin();
-        it != regions.end();
-        it++) {
-
-      cv::Rect_<float> & rect = *it;
-
-	  VLOG(2) << "left: " << rect.x
-		  << ", top: " << rect.y
-		  << ", right: " << rect.width
-		  << ", bottom: " << rect.height;
+   for (cv::Rect_<float> & rect : regions) {
+      VLOG(2) << "left: " << rect.x
+              << ", top: " << rect.y
+              << ", right: " << rect.width
+              << ", bottom: " << rect.height;
 
       EXPECT_DEATH(imgScanner->acquireImage(300, 0, 0, rect.x, rect.y, rect.width, rect.height),
                    "bounding box exeeds flatbed dimensions");

@@ -259,9 +259,8 @@ void DmScanLib::writeDecodedImage(const Image & image,
       decodedImage.drawRectangle(wellDecoders[i]->getWellRectangle(), colorBlue);
    }
 
-   for (std::map<std::string, const WellDecoder *>::const_iterator ii = decodedWells.begin();
-        ii != decodedWells.end(); ++ii) {
-      const WellDecoder & decodedWell = *(ii->second);
+   for (auto & kv : decodedWells) {
+      const WellDecoder & decodedWell = *kv.second;
       const std::vector<cv::Point> & bboxDecoded = decodedWell.getDecodedQuad();
 
       decodedImage.drawLine(bboxDecoded[0], bboxDecoded[1], colorRed);

@@ -154,9 +154,7 @@ std::vector<std::string> & ImageInfo::split(const std::string &s,
 unsigned ImageInfo::stringToUnsigned(const std::string& s) {
    std::istringstream i(s);
    unsigned x;
-   if (!(i >> x))
-      return 0;
-   return x;
+   return (!(i >> x)) ? 0 : x;
 }
 
 const std::string * ImageInfo::getBarcodeMsg(const std::string & label) {
@@ -170,27 +168,25 @@ const std::string * ImageInfo::getBarcodeMsg(const std::string & label) {
 std::ostream & operator<<(std::ostream &os, const ImageInfo & m) {
    os << "imageFilename=\"" << m.imageFilename << "\"" << std::endl;
 
-   os << "boundingBox = {"
+   os << "boundingBox = ["
       << " x = " << m.boundingBox->x
-      << "; y = " << m.boundingBox->y
-      << "; width = " << m.boundingBox->width
-      << "; height = " << m.boundingBox->height
-      << "; }"
+      << ", y = " << m.boundingBox->y
+      << ", width = " << m.boundingBox->width
+      << ", height = " << m.boundingBox->height
+      << " ]"
       << std::endl;
 
-   os << "palletSize = {"
+   os << "palletSize = ["
       << " rows = "<< m.palletRows
-      << "; columns=" << m.palletCols
-      << "; }"
+      << ", columns=" << m.palletCols
+      << " ]"
       << std::endl;
 
    os << "orientation=\"" << m.orientation << "\"" << std::endl;
    os << "barcodePosition=\"" << m.barcodePosition << "\"" << std::endl;
 
-   std::map<const std::string, const std::string>::const_iterator ii = m.wells.begin();
-
-   for (; ii != m.wells.end(); ++ii) {
-      os << ii->first << "=\"" << ii->second << "\"" << std::endl;
+   for (auto & kv : m.wells) {
+      os << kv.first << "=\"" << kv.second << "\"" << std::endl;
    }
    return os;
 }

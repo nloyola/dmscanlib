@@ -108,11 +108,9 @@ jobject createValidDpisResultObject(JNIEnv * env,
       jmethodID method = env->GetMethodID(resultClass, "addDpi", "(I)V");
       CHECK(method != NULL) << "could not find JNI method";
 
-      for (std::vector<int>::const_iterator it = validDpis.begin();
-           it != validDpis.end();
-           ++it) {
+      for (const int & dpi : validDpis) {
          jvalue data[1];
-         data[0].i = *it;
+         data[0].i = dpi;
          env->CallObjectMethodA(resultObj, method, data);
       }
    }
@@ -137,11 +135,8 @@ jobject createDecodeResultObject(
 
       CHECK(method != NULL) << "could not find JNI method";
 
-      for (std::map<std::string, const dmscanlib::WellDecoder *>::const_iterator ii =
-              wellDecoders.begin();
-           ii != wellDecoders.end();
-           ++ii) {
-         const dmscanlib::WellDecoder & wellDecoder = *(ii->second);
+      for (auto & kv : wellDecoders) {
+         const dmscanlib::WellDecoder & wellDecoder = *kv.second;
          VLOG(5) << wellDecoder;
 
          jvalue data[3];
@@ -176,11 +171,9 @@ jobject createDeviceNamesResultObject(JNIEnv * env,
                                          "addDeviceName",
                                          "(Ljava/lang/String;)V");
       CHECK(method != NULL) << "could not find JNI method";
-      for (std::vector<std::string>::const_iterator it = deviceNames.begin();
-           it != deviceNames.end();
-           ++it) {
+      for (const std::string & name : deviceNames) {
          jvalue data[1];
-         data[0].l = env->NewStringUTF(it->c_str());
+         data[0].l = env->NewStringUTF(name.c_str());
          env->CallObjectMethodA(resultObj, method, data);
       }
    }

@@ -84,18 +84,4 @@ TEST(TestImgScannerLinux, getFlatbedDimensions) {
    ASSERT_GT(pair.second, 0.0);
 }
 
-TEST(TestImgScannerLinux, getBrightnessRangeNoDeviceSelected) {
-   FLAGS_v = 3;
-   imgscanner::ImgScannerSane imgScanner;
-   std::pair<int, int> range;
-   EXPECT_DEATH(imgScanner.getBrightnessRange(range), "no device selected");
-}
-
-TEST(TestImgScannerLinux, getContrastRangeNoDeviceSelected) {
-   FLAGS_v = 3;
-   imgscanner::ImgScannerSane imgScanner;
-   std::pair<int, int> range;
-   EXPECT_DEATH(imgScanner.getContrastRange(range), "no device selected");
-}
-
 } /* namespace */

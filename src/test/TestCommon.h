@@ -26,6 +26,8 @@ void initializeTwain();
 
 std::string & getFirstDevice();
 
+void deleteFile(const std::string & filename);
+
 bool getTestImageInfoFilenames(std::string dir, std::vector<std::string> & filenames);
 
 void getWellRectsForBoundingBox(const cv::Rect & bbox,
@@ -38,6 +40,8 @@ void getWellRectsForBoundingBox(const cv::Rect & bbox,
 std::unique_ptr<DecodeOptions> getDefaultDecodeOptions();
 
 int decodeImage(std::string fname, DmScanLib & dmScanLib, unsigned rows, unsigned cols);
+
+const int IMAGE_PIXELS_THRESHOLD = 5;
 
 } /* namespace */
 

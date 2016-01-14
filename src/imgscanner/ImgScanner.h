@@ -59,10 +59,6 @@ public:
 
    virtual void getFlatbedDimensionsInInches(std::pair<float, float> & dimensions) = 0;
 
-   virtual void getBrightnessRange(std::pair<int, int> & pair) = 0;
-
-   virtual void getContrastRange(std::pair<int, int> & pair) = 0;
-
    virtual std::unique_ptr<Image> acquireImage(unsigned dpi,
                                                int brightness,
                                                int contrast,
@@ -76,6 +72,14 @@ public:
                                                  int contrast) = 0;
 
    virtual int getErrorCode() = 0;
+
+   static const int MAX_BRIGHTNESS = 1000;
+
+   static const int MIN_BRIGHTNESS = -1000;
+
+   static const int MAX_CONTRAST = 1000;
+
+   static const int MIN_CONTRAST = -1000;
 
 protected:
 };

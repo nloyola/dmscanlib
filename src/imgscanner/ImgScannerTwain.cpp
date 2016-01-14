@@ -157,48 +157,6 @@ void ImgScannerTwain::getFlatbedDimensionsInInches(std::pair<float, float> & dim
    scannerSourceDeinit(hwnd, srcID);
 }
 
-void ImgScannerTwain::getBrightnessRange(std::pair<int, int> & pair) {
-   HWND hwnd;
-   TW_IDENTITY srcID;
-   Capability capability;
-
-   if (!scannerSourceInit(hwnd, srcID)) {
-      errorCode = SC_FAIL;
-      return;
-   }
-
-   getCapabilityInternal(srcID, ICAP_BRIGHTNESS, capability);
-   scannerSourceDeinit(hwnd, srcID);
-
-   VLOG(5) << "brightness: " << capability.range.min
-	   << " to " << capability.range.max
-	   << " step " << capability.range.step;
-
-   pair.first = static_cast<int>(capability.range.min);
-   pair.second = static_cast<int>(capability.range.max);
-}
-
-void ImgScannerTwain::getContrastRange(std::pair<int, int> & pair) {
-   HWND hwnd;
-   TW_IDENTITY srcID;
-   Capability capability;
-
-   if (!scannerSourceInit(hwnd, srcID)) {
-      errorCode = SC_FAIL;
-      return;
-   }
-
-   getCapabilityInternal(srcID, ICAP_CONTRAST, capability);
-   scannerSourceDeinit(hwnd, srcID);
-
-   VLOG(5) << "contrast: " << capability.range.min
-	   << " to " << capability.range.max
-	   << " step " << capability.range.step;
-
-   pair.first = static_cast<int>(capability.range.min);
-   pair.second = static_cast<int>(capability.range.max);
-}
-
 /*
  * @params - none
  * @return - Image acquired from twain source, in dmtxImage format

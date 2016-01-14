@@ -126,10 +126,6 @@ public:
 
    void getFlatbedDimensionsInInches(std::pair<float, float> & dimensions);
 
-   void getBrightnessRange(std::pair<int, int> & pair);
-
-   void getContrastRange(std::pair<int, int> & pair);
-
    /**
     * Flatbed coordinates are in inches.
     */

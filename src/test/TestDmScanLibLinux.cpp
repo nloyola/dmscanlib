@@ -37,9 +37,8 @@ public:
 // check that the decoded message matches the one in the "nfo" file
 void checkDecodeInfo(DmScanLib & dmScanLib, dmscanlib::test::ImageInfo & imageInfo) {
    const std::map<std::string, const WellDecoder *> & decodedWells = dmScanLib.getDecodedWells();
-   for (std::map<std::string, const WellDecoder *>::const_iterator ii = decodedWells.begin();
-        ii != decodedWells.end(); ++ii) {
-      const WellDecoder & decodedWell = *(ii->second);
+   for (auto & kv : decodedWells) {
+      const WellDecoder & decodedWell = *kv.second;
       const std::string & label = decodedWell.getLabel();
       const std::string * nfoDecodedMsg = imageInfo.getBarcodeMsg(label);
 

@@ -191,9 +191,8 @@ void ImageInfoTool::decodeImage(std::vector<std::unique_ptr<const WellRectangle>
 
    if (dmScanLib.getDecodedWellCount() > 0) {
       const std::map<std::string, const WellDecoder *> & decodedWells = dmScanLib.getDecodedWells();
-      for (std::map<std::string, const WellDecoder *>::const_iterator ii = decodedWells.begin();
-           ii != decodedWells.end(); ++ii) {
-         const WellDecoder & decodedWell = *(ii->second);
+      for (auto & kv : decodedWells) {
+         const WellDecoder & decodedWell = *kv.second;
          decodedMessages[decodedWell.getLabel()] = decodedWell.getMessage();
       }
    }

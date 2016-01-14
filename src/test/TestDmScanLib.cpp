@@ -10,6 +10,7 @@
 #include "DmScanLib.h"
 #include "decoder/Decoder.h"
 #include "decoder/WellDecoder.h"
+#include "imgscanner/ImgScanner.h"
 #include "test/TestCommon.h"
 
 #define GLOG_NO_ABBREVIATED_SEVERITIES
@@ -19,20 +20,6 @@
 using namespace dmscanlib;
 
 namespace {
-
-int IMAGE_PIXELS_THRESHOLD = 5;
-
-/**
- * Do not care if call to delete file fails.
- */
-void deleteFile(const std::string & filename) {
-#ifdef WIN32
-   std::wstring fnamew(filename.begin(), filename.end());
-   DeleteFile(fnamew.c_str());
-#else
-   remove(filename.c_str());
-#endif
-}
 
 TEST(TestDmScanLib, selectSourceAsDefault) {
     FLAGS_v = 1;
@@ -45,6 +32,36 @@ TEST(TestDmScanLib, selectSourceAsDefault) {
 #endif
 }
 
+TEST(TestDmScanLib, getValidDpis) {
+   FLAGS_v = 1;
+
+   std::vector<int> validDpis;
+   DmScanLib dmScanLib;
+
+   dmScanLib.selectDevice(test::getFirstDevice().c_str());
+   dmScanLib.getValidDpis(validDpis);
+   EXPECT_GT(validDpis.size(), 0);
+
+   for (int &dpi : validDpis) {
+      VLOG(1) << "dpi: " << dpi;
+   }
+}
+
+TEST(TestDmScanLib, getFlatbedDimensions) {
+   FLAGS_v = 1;
+
+   std::pair<float, float> dimensions;
+   DmScanLib dmScanLib;
+
+   dmScanLib.selectDevice(test::getFirstDevice().c_str());
+   dmScanLib.getFlatbedDimensions(dimensions);
+
+   EXPECT_GT(dimensions.first, 0);
+   EXPECT_GT(dimensions.second, 0);
+
+   VLOG(1) << "flatbed dimensions: " << dimensions.first << ", " << dimensions.second;
+}
+
 TEST(TestDmScanLib, scanImage) {
    FLAGS_v = 1;
 
@@ -55,7 +72,7 @@ TEST(TestDmScanLib, scanImage) {
    float height = 2.755f;
 
    std::string const fname("tmpscan.png");
-   deleteFile(fname);
+   test::deleteFile(fname);
 
    DmScanLib dmScanLib(1);
    int result = dmScanLib.scanImage(test::getFirstDevice().c_str(),
@@ -74,8 +91,8 @@ TEST(TestDmScanLib, scanImage) {
    int expectedWidth = static_cast<int>(static_cast<float>(width * dpi));
    int expectedHeight = static_cast<int>(static_cast<float>(height * dpi));
 
-   ASSERT_LE(abs(expectedWidth - image.getWidth()), IMAGE_PIXELS_THRESHOLD);
-   ASSERT_LE(abs(expectedHeight - image.getHeight()), IMAGE_PIXELS_THRESHOLD);
+   ASSERT_LE(abs(expectedWidth - image.getWidth()), test::IMAGE_PIXELS_THRESHOLD);
+   ASSERT_LE(abs(expectedHeight - image.getHeight()), test::IMAGE_PIXELS_THRESHOLD);
 }
 
 TEST(TestDmScanLib, scanImageBadParams) {
@@ -112,11 +129,119 @@ TEST(TestDmScanLib, scanImageInvalidDpi) {
    EXPECT_EQ(SC_INVALID_DPI, result);
 }
 
+TEST(TestDmScanLib, scanImageBrightnessLimits) {
+   FLAGS_v = 1;
+
+   DmScanLib dmScanLib(1);
+   std::string fname("tmpscan.png");
+
+   int result = dmScanLib.scanImage(test::getFirstDevice().c_str(),
+                                    75,
+                                    ImgScanner::MIN_BRIGHTNESS,
+                                    0,
+                                    0.0f,
+                                    0.0f,
+                                    1.0f,
+                                    1.0f,
+                                    fname.c_str());
+   EXPECT_EQ(SC_SUCCESS, result);
+
+   result = dmScanLib.scanImage(test::getFirstDevice().c_str(),
+                                75,
+                                ImgScanner::MAX_BRIGHTNESS,
+                                0,
+                                0.0f,
+                                0.0f,
+                                1.0f,
+                                1.0f,
+                                fname.c_str());
+   EXPECT_EQ(SC_SUCCESS, result);
+}
+
+TEST(TestDmScanLib, scanImageInvalidBrightness) {
+   FLAGS_v = 1;
+
+   DmScanLib dmScanLib(1);
+   std::string fname("tmpscan.png");
+
+   int invalidBrightnessValues[2];
+   invalidBrightnessValues[0] = ImgScanner::MIN_BRIGHTNESS - 1;
+   invalidBrightnessValues[1] = ImgScanner::MAX_BRIGHTNESS + 1;
+
+   for (const int &value : invalidBrightnessValues) {
+      EXPECT_DEATH(
+         dmScanLib.scanImage(test::getFirstDevice().c_str(),
+                             75,
+                             value,
+                             0,
+                             0.0f,
+                             0.0f,
+                             1.0f,
+                             1.0f,
+                             fname.c_str()),
+         "brightness value is not valid: " + std::to_string(value));
+   }
+}
+
+TEST(TestDmScanLib, scanImageContrastLimits) {
+   FLAGS_v = 1;
+
+   DmScanLib dmScanLib(1);
+   std::string fname("tmpscan.png");
+
+   int result = dmScanLib.scanImage(test::getFirstDevice().c_str(),
+                                    75,
+                                    0,
+                                    ImgScanner::MIN_CONTRAST,
+                                    0.0f,
+                                    0.0f,
+                                    1.0f,
+                                    1.0f,
+                                    fname.c_str());
+   EXPECT_EQ(SC_SUCCESS, result);
+
+   result = dmScanLib.scanImage(test::getFirstDevice().c_str(),
+                                75,
+                                0,
+                                ImgScanner::MAX_CONTRAST,
+                                0.0f,
+                                0.0f,
+                                1.0f,
+                                1.0f,
+                                fname.c_str());
+   EXPECT_EQ(SC_SUCCESS, result);
+}
+
+TEST(TestDmScanLib, scanImageInvalidContrast) {
+   FLAGS_v = 1;
+
+   DmScanLib dmScanLib(1);
+   std::string fname("tmpscan.png");
+
+   int invalidContrastValues[2];
+   invalidContrastValues[0] = ImgScanner::MIN_CONTRAST - 1;
+   invalidContrastValues[1] = ImgScanner::MAX_CONTRAST + 1;
+
+   for (const int &value : invalidContrastValues) {
+      EXPECT_DEATH(
+         dmScanLib.scanImage(test::getFirstDevice().c_str(),
+                             75,
+                             0,
+                             value,
+                             0.0f,
+                             0.0f,
+                             1.0f,
+                             1.0f,
+                             fname.c_str()),
+         "contrast value is not valid: " + std::to_string(value));
+   }
+}
+
 TEST(TestDmScanLib, scanFlatbed) {
    FLAGS_v = 1;
 
    std::string fname("flatbed.png");
-   deleteFile(fname);
+   test::deleteFile(fname);
 
    const unsigned dpi = 75;
    DmScanLib dmScanLib(1);
@@ -135,15 +260,15 @@ TEST(TestDmScanLib, scanFlatbed) {
    int expectedWidth = static_cast<int>(static_cast<float>(dimensions.first * dpi));
    int expectedHeight = static_cast<int>(static_cast<float>(dimensions.second * dpi));
 
-   ASSERT_LE(abs(expectedWidth - image.getWidth()), IMAGE_PIXELS_THRESHOLD);
-   ASSERT_LE(abs(expectedHeight - image.getHeight()), IMAGE_PIXELS_THRESHOLD);
+   ASSERT_LE(abs(expectedWidth - image.getWidth()), test::IMAGE_PIXELS_THRESHOLD);
+   ASSERT_LE(abs(expectedHeight - image.getHeight()), test::IMAGE_PIXELS_THRESHOLD);
 }
 
 TEST(TestDmScanLib, scanFlatbedBadParams) {
    FLAGS_v = 1;
 
    std::string fname("flatbed.png");
-   deleteFile(fname);
+   test::deleteFile(fname);
 
    DmScanLib dmScanLib(1);
    EXPECT_DEATH(dmScanLib.scanFlatbed(test::getFirstDevice().c_str(),
@@ -203,9 +328,8 @@ TEST(TestDmScanLib, scanAndDecode) {
    const std::map<std::string, const WellDecoder *> & decodedWells =
       dmScanLib.getDecodedWells();
 
-   for (std::map<std::string, const WellDecoder *>::const_iterator ii = decodedWells.begin();
-        ii != decodedWells.end(); ++ii) {
-      const dmscanlib::WellDecoder & wellDecoder = *(ii->second);
+   for (auto & kv : decodedWells) {
+      const dmscanlib::WellDecoder & wellDecoder = *kv.second;
       VLOG(1) << wellDecoder.getLabel() << ": " << wellDecoder.getMessage();
    }
 
@@ -259,9 +383,8 @@ TEST(TestDmScanLib, scanAndDecodeMultiple) {
    const std::map<std::string, const WellDecoder *> & decodedWells =
       dmScanLib.getDecodedWells();
 
-   for (std::map<std::string, const WellDecoder *>::const_iterator ii = decodedWells.begin();
-        ii != decodedWells.end(); ++ii) {
-      const dmscanlib::WellDecoder & wellDecoder = *(ii->second);
+   for (auto & kv : decodedWells) {
+      const dmscanlib::WellDecoder & wellDecoder = *kv.second;
       lastResults[wellDecoder.getLabel()] = wellDecoder.getMessage();
    }
 
@@ -278,9 +401,8 @@ TEST(TestDmScanLib, scanAndDecodeMultiple) {
 
    const std::map<std::string, const WellDecoder *> & decodedWells2 =
       dmScanLib.getDecodedWells();
-   for (std::map<std::string, const WellDecoder *>::const_iterator ii = decodedWells2.begin();
-        ii != decodedWells2.end(); ++ii) {
-      const dmscanlib::WellDecoder & wellDecoder = *(ii->second);
+   for (auto & kv : decodedWells2) {
+      const dmscanlib::WellDecoder & wellDecoder = *kv.second;
 
       if (lastResults.find(wellDecoder.getLabel()) != lastResults.end()) {
          EXPECT_EQ(lastResults[wellDecoder.getLabel()], wellDecoder.getMessage());

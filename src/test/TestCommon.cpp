@@ -36,8 +36,8 @@ namespace dmscanlib {
 namespace test {
 
 #ifdef WIN32
-	static HMODULE g_hLib;
-	static DSMENTRYPROC g_pDSM_Entry;
+static HMODULE g_hLib;
+static DSMENTRYPROC g_pDSM_Entry;
 #endif
 
 void initializeTwain() {
@@ -76,6 +76,18 @@ std::string & getFirstDevice() {
 #endif
 
    return firstDeviceName;
+}
+
+/**
+ * Do not care if call to delete file fails.
+ */
+void deleteFile(const std::string & filename) {
+#ifdef WIN32
+   std::wstring fnamew(filename.begin(), filename.end());
+   DeleteFile(fnamew.c_str());
+#else
+   remove(filename.c_str());
+#endif
 }
 
 /*
