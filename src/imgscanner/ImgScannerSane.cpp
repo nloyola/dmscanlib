@@ -299,14 +299,15 @@ std::unique_ptr<Image> ImgScannerSane::acquireImageInternal(unsigned dpi,
       return std::unique_ptr<Image>{};
    }
 
-   const SaneOptionRangeConstraint<int> * brightnessOpt = getOptionRangeInt(brightnessOption);
-   const SaneOptionRangeConstraint<int> * contrastOpt = getOptionRangeInt(contrastOption);
+   if ((brightness < MIN_BRIGHTNESS) || (brightness > MAX_BRIGHTNESS )) {
+      errorCode = SC_INVALID_BRIGHTNESS;
+      return std::unique_ptr<Image>{};
+   }
 
-   CHECK_GE(brightness, MIN_BRIGHTNESS ) << "brightness value is not valid: " << brightness ;
-   CHECK_LE(brightness, MAX_BRIGHTNESS ) << "brightness value is not valid: " << brightness ;
-
-   CHECK_GE(contrast, MIN_CONTRAST) << "contrast value is not valid: " << contrast ;
-   CHECK_LE(contrast, MAX_CONTRAST) << "contrast value is not valid: " << contrast ;
+   if ((contrast < MIN_CONTRAST) || (contrast > MAX_CONTRAST )) {
+      errorCode = SC_INVALID_CONTRAST;
+      return std::unique_ptr<Image>{};
+   }
 
    const SaneOptionRangeConstraint<double> * rightOpt = getOptionRangeDouble(geometryRightOption);
    const SaneOptionRangeConstraint<double> * bottomOpt = getOptionRangeDouble(geometryBottomOption);
@@ -325,6 +326,9 @@ std::unique_ptr<Image> ImgScannerSane::acquireImageInternal(unsigned dpi,
    saneHandle = SaneUtil::openDevice(deviceName);
 
    // configure device for scan
+   const SaneOptionRangeConstraint<int> * brightnessOpt = getOptionRangeInt(brightnessOption);
+   const SaneOptionRangeConstraint<int> * contrastOpt = getOptionRangeInt(contrastOption);
+
    int scaledBrightness = SaneUtil::scaleValue(brightness, brightnessOpt->getMax(), 1000);
    int scaledContrast = SaneUtil::scaleValue(contrast, contrastOpt->getMax(), 1000);
 

@@ -19,7 +19,7 @@ namespace jni {
 
 const char * const CLASS_SCAN_LIB_RESULT     = "org/biobank/dmscanlib/ScanLibResult";
 const char * const CLASS_VALUE_RESULT        = "org/biobank/dmscanlib/ValueResult";
-const char * const CLASS_VALID_DPIS_RESULT   =  "org/biobank/dmscanlib/ValidDpis";
+const char * const CLASS_VALID_DPIS_RESULT   =  "org/biobank/dmscanlib/ValidDpisResult";
 const char * const CLASS_DECODE_RESULT       = "org/biobank/dmscanlib/DecodeResult";
 const char * const CLASS_DEVICE_NAMES_RESULT = "org/biobank/dmscanlib/DeviceNamesResult";
 
@@ -43,6 +43,10 @@ const char * const getResultCodeMsg(int resultCode) {
          return "incorrect DPI on scanned image";
       case SC_INVALID_DEVICE:
          return "invalid device selected";
+      case SC_INVALID_BRIGHTNESS:
+         return "invalid brightness";
+      case SC_INVALID_CONTRAST:
+         return "invalid contrast";
       default:
          break;
    }
@@ -146,7 +150,7 @@ jobject createDecodeResultObject(
          env->CallObjectMethodA(resultObj, method, data);
       }
 
-      VLOG(1) << "wells decoded: " << wellDecoders.size();
+      VLOG(2) << "wells decoded: " << wellDecoders.size();
    }
 
    return resultObj;

@@ -129,7 +129,7 @@ int Decoder::decodeMultiThreaded() {
       VLOG(5) << wellDecoder;
       if (!wellDecoder.getMessage().empty()) {
          if (decodedWells.find(wellDecoder.getMessage()) != decodedWells.end()) {
-            VLOG(1) << "duplicate decode message found: " << wellDecoder.getMessage();
+            VLOG(2) << "duplicate decode message found: " << wellDecoder.getMessage();
             return SC_FAIL;
          }
 

@@ -61,7 +61,7 @@ void ImgScannerTwain::init() {
 
 void ImgScannerTwain::setTwainDsmEntry(DSMENTRYPROC twainDsmEntry) {
    ImgScannerTwain::twainDsmEntry = twainDsmEntry;
-   VLOG(1) << "ImgScannerTwain::setTwainDsmEntry";
+   VLOG(2) << "ImgScannerTwain::setTwainDsmEntry";
 }
 
 /*

@@ -37,6 +37,8 @@ const int SC_INVALID_IMAGE             = -5;
 const int SC_INVALID_NOTHING_TO_DECODE = -6;
 const int SC_INCORRECT_DPI_SCANNED     = -7;
 const int SC_INVALID_DEVICE            = -8;
+const int SC_INVALID_BRIGHTNESS        = -9;
+const int SC_INVALID_CONTRAST          = -10;
 
 const unsigned CAP_IS_WIA     = 0x01;
 const unsigned CAP_IS_SCANNER = 0x02;

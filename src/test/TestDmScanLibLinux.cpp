@@ -60,7 +60,7 @@ std::unique_ptr<DecodeTestResult> decodeFromInfo(std::string & infoFilename,
    if (testResult->infoFileValid) {
       Image image(imageInfo.getImageFilename());
 
-      VLOG(1) << "image dimensions: width: " << image.getWidth()
+      VLOG(2) << "image dimensions: width: " << image.getWidth()
               << ", height: " << image.getHeight();
 
       testResult->totalTubes = imageInfo.getDecodedWellCount();
@@ -123,7 +123,7 @@ TEST(TestDmScanLibLinux, readInfoFiles) {
 
    for (unsigned i = 0, n = filenames.size(); i < n; ++i) {
       ss.str("");
-      VLOG(1) << "test image info: " << filenames[i];
+      VLOG(2) << "test image info: " << filenames[i];
 
       dmscanlib::test::ImageInfo imageInfo(filenames[i]);
       bool result = imageInfo.isValid();
@@ -161,7 +161,7 @@ TEST(TestDmScanLibLinux, decodeFromInfo) {
    if (testResult->decodeResult == SC_SUCCESS) {
       EXPECT_TRUE(testResult->totalDecoded > 0);
 
-      VLOG(1) << "total: " << testResult->totalTubes
+      VLOG(2) << "total: " << testResult->totalTubes
               << ", decoded: " << testResult->totalDecoded
               << ", time taken: " << testResult->decodeTime;
 
@@ -195,7 +195,7 @@ TEST(TestDmScanLibLinux, decodeAllImages) {
 
    for (unsigned i = 0, n = filenames.size(); i < n; ++i) {
       ss.str("");
-      VLOG(1) << "test image info: " << filenames[i];
+      VLOG(2) << "test image info: " << filenames[i];
 
       DmScanLib dmScanLib(0);
       std::unique_ptr<DecodeTestResult> testResult =
@@ -213,7 +213,7 @@ TEST(TestDmScanLibLinux, decodeAllImages) {
             << testResult->totalDecoded / static_cast<float>(testResult->totalTubes) << ","
             << testResult->decodeTime;
 
-         VLOG(1) << "decoded: " << testResult->totalDecoded
+         VLOG(2) << "decoded: " << testResult->totalDecoded
                  << ", total: " << testResult->totalTubes
                  << ", time taken: " << testResult->decodeTime;
 
@@ -233,7 +233,7 @@ TEST(TestDmScanLibLinux, decodeAllImages) {
    ss << "average decode time:," << avgDecodeTime;
    testResults.push_back(ss.str());
 
-   VLOG(1) << "total tubes: " << totalTubes
+   VLOG(2) << "total tubes: " << totalTubes
            << ", total decoded: " << totalDecoded
            << ", average decode time: " << avgDecodeTime;
 
@@ -275,7 +275,7 @@ TEST(TestDmScanLibLinux, DISABLED_decodeAllImagesAllParameters) {
 
             for (unsigned i = 0, n = filenames.size(); i < n; ++i) {
                ss.str("");
-               VLOG(1) << "test image info: " << filenames[i];
+               VLOG(2) << "test image info: " << filenames[i];
 
                DmScanLib dmScanLib(0);
                std::unique_ptr<DecodeTestResult> testResult =
@@ -296,7 +296,7 @@ TEST(TestDmScanLibLinux, DISABLED_decodeAllImagesAllParameters) {
                      << "," << maxEdge
                      << "," << scanGap;
 
-                  VLOG(1) << "decoded: " << testResult->totalDecoded
+                  VLOG(2) << "decoded: " << testResult->totalDecoded
                           << ", total: " << testResult->totalTubes
                           << ", time taken: " << testResult->decodeTime
                           << ", minEdgeFactor: " << minEdge

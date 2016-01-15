@@ -106,7 +106,7 @@ int DmScanLib::scanImage(const char * const deviceName,
                          float bottom,
                          const char * const filename) {
 
-   VLOG(1) << "scanImage: deviceName: " << deviceName
+   VLOG(2) << "scanImage: deviceName: " << deviceName
            << ", dpi:" << dpi
            << ", brightness:" << brightness
            << ", contrast:" << contrast
@@ -127,7 +127,7 @@ int DmScanLib::scanImage(const char * const deviceName,
                                                           right,
                                                           bottom);
    if (image.get() == NULL) {
-      VLOG(1) << "could not acquire image";
+      VLOG(2) << "could not acquire image";
       return imgScanner->getErrorCode();
    }
 
@@ -140,7 +140,7 @@ int DmScanLib::scanFlatbed(const char * const deviceName,
                            int brightness,
                            int contrast,
                            const char * const filename) {
-   VLOG(1) << "scanFlatbed: deviceName: " << deviceName
+   VLOG(2) << "scanFlatbed: deviceName: " << deviceName
            << ", dpi:" << dpi
            << ", brightness:" << brightness
            << ", contrast:" << contrast
@@ -151,7 +151,7 @@ int DmScanLib::scanFlatbed(const char * const deviceName,
    imgScanner->selectDevice(deviceName);
    std::unique_ptr<Image> image = imgScanner->acquireFlatbed(dpi, brightness, contrast);
    if (image.get() == NULL) {
-      VLOG(1) << "could not acquire image";
+      VLOG(2) << "could not acquire image";
       return imgScanner->getErrorCode();
    }
    image->write(filename);
@@ -189,13 +189,13 @@ int DmScanLib::scanAndDecode(const char * const deviceName,
                                                           right,
                                                           bottom);
    if (image.get() == NULL) {
-      VLOG(1) << "could not acquire image";
+      VLOG(2) << "could not acquire image";
       return imgScanner->getErrorCode();
    }
    image->write("scanned.png");
    result = decodeCommon(*image, decodeOptions, "decode.png", wellRects);
 
-   VLOG(1) << "decodeCommon returned: " << result;
+   VLOG(2) << "decodeCommon returned: " << result;
    return result;
 }
 
@@ -203,7 +203,7 @@ int DmScanLib::decodeImageWells(const char * const filename,
                                 const DecodeOptions & decodeOptions,
                                 std::vector<std::unique_ptr<const WellRectangle> > & wellRects) {
 
-   VLOG(1) << "decodeImageWells: filename:" << filename
+   VLOG(2) << "decodeImageWells: filename:" << filename
            << ", numWellRects:" << wellRects.size()
            << ", " << decodeOptions;
 

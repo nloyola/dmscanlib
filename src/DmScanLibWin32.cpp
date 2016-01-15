@@ -130,14 +130,14 @@ BOOL WINAPI DllMain (HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
 
 #ifdef _DEBUG
       dmscanlib::DmScanLib::configLogging(2, false);
-      VLOG(1) << "DllMain: process attach";
+      VLOG(2) << "DllMain: process attach";
 #endif
    } else if (fdwReason == DLL_PROCESS_DETACH) {
       // If the TWAIN_32.DLL library was loaded, remove it from memory.
       if (g_hLib != 0) {
          FreeLibrary (g_hLib);
 #ifdef _DEBUG
-         VLOG(1) << "DllMain: process detach";
+         VLOG(2) << "DllMain: process detach";
 #endif
       }
    }

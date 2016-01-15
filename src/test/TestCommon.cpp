@@ -133,7 +133,7 @@ bool getTestImageInfoFilenames(std::string dir, std::vector<std::string> & filen
     searchstrw.append(L"\\*.*");
 
     if((hFind = FindFirstFile((LPCWSTR) searchstrw.c_str(), &fdFile)) == INVALID_HANDLE_VALUE) {
-        //VLOG(1) << "error is: " << GetLastError();
+        //VLOG(2) << "error is: " << GetLastError();
         return false;
     }
 
