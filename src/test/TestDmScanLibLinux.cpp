@@ -60,7 +60,7 @@ std::unique_ptr<DecodeTestResult> decodeFromInfo(std::string & infoFilename,
    if (testResult->infoFileValid) {
       Image image(imageInfo.getImageFilename());
 
-      VLOG(2) << "image dimensions: width: " << image.getWidth()
+      VLOG(1) << "image dimensions: width: " << image.getWidth()
               << ", height: " << image.getHeight();
 
       testResult->totalTubes = imageInfo.getDecodedWellCount();
@@ -151,7 +151,7 @@ TEST(TestDmScanLibLinux, decodeFromInfo) {
                                defaultDecodeOptions->corrections,
                                defaultDecodeOptions->shrink);
 
-   DmScanLib dmScanLib(0);
+   DmScanLib dmScanLib;
    std::unique_ptr<DecodeTestResult> testResult = decodeFromInfo(infoFilename,
                                                                  decodeOptions,
                                                                  dmScanLib);
@@ -197,7 +197,7 @@ TEST(TestDmScanLibLinux, decodeAllImages) {
       ss.str("");
       VLOG(2) << "test image info: " << filenames[i];
 
-      DmScanLib dmScanLib(0);
+      DmScanLib dmScanLib;
       std::unique_ptr<DecodeTestResult> testResult =
          decodeFromInfo(filenames[i], decodeOptions, dmScanLib);
       EXPECT_TRUE(testResult->infoFileValid);
@@ -277,7 +277,7 @@ TEST(TestDmScanLibLinux, DISABLED_decodeAllImagesAllParameters) {
                ss.str("");
                VLOG(2) << "test image info: " << filenames[i];
 
-               DmScanLib dmScanLib(0);
+               DmScanLib dmScanLib;
                std::unique_ptr<DecodeTestResult> testResult =
                   decodeFromInfo(filenames[i], decodeOptions, dmScanLib);
                EXPECT_TRUE(testResult->infoFileValid);

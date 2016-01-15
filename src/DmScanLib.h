@@ -58,7 +58,6 @@ enum PalletSize { PSIZE_8x12, PSIZE_10x10, PSIZE_12x12, PSIZE_9x9, PSIZE_1x1, PS
 class DmScanLib {
 public:
    DmScanLib();
-   DmScanLib(unsigned loggingLevel, bool logToFile = true);
    virtual ~DmScanLib();
 
    int selectSourceAsDefault();

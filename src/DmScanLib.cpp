@@ -23,7 +23,6 @@
 #include "decoder/WellDecoder.h"
 #include "Image.h"
 
-#include <stdio.h>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -44,12 +43,6 @@ bool DmScanLib::loggingInitialized = false;
 DmScanLib::DmScanLib() :
       imgScanner(std::move(ImgScanner::create()))
 {
-}
-
-DmScanLib::DmScanLib(unsigned loggingLevel, bool logToFile) :
-      imgScanner(std::move(ImgScanner::create()))
-{
-   configLogging(loggingLevel, logToFile);
 }
 
 DmScanLib::~DmScanLib() {
@@ -83,17 +76,15 @@ void DmScanLib::getFlatbedDimensions(std::pair<float, float> & dimensions) {
 }
 
 void DmScanLib::configLogging(unsigned level, bool useFile) {
-   if (loggingInitialized)
-      return;
+   if (!loggingInitialized) {
+      google::InitGoogleLogging(LIBRARY_NAME.c_str());
+      loggingInitialized = true;
+   }
 
-   google::InitGoogleLogging(LIBRARY_NAME.c_str());
    FLAGS_v = level;
    FLAGS_stderrthreshold = (level > 0) ? google::GLOG_INFO : google::GLOG_ERROR;
-
    FLAGS_logtostderr = !useFile;
    FLAGS_alsologtostderr = false;
-
-   loggingInitialized = true;
 }
 
 int DmScanLib::scanImage(const char * const deviceName,
@@ -106,7 +97,7 @@ int DmScanLib::scanImage(const char * const deviceName,
                          float bottom,
                          const char * const filename) {
 
-   VLOG(2) << "scanImage: deviceName: " << deviceName
+   VLOG(1) << "scanImage: deviceName: " << deviceName
            << ", dpi:" << dpi
            << ", brightness:" << brightness
            << ", contrast:" << contrast

@@ -150,7 +150,7 @@ jobject createDecodeResultObject(
          env->CallObjectMethodA(resultObj, method, data);
       }
 
-      VLOG(2) << "wells decoded: " << wellDecoders.size();
+      VLOG(1) << "wells decoded: " << wellDecoders.size();
    }
 
    return resultObj;

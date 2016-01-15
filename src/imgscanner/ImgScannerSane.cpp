@@ -129,7 +129,7 @@ void ImgScannerSane::selectDevice(const std::string & name) {
 }
 
 void ImgScannerSane::getValidDpis(std::vector<int> & validDpis) {
-   VLOG(2) << "getValidDpis";
+   VLOG(1) << "getValidDpis";
 
    CHECK_GT(deviceName.length(), 0) << "no device selected";
 

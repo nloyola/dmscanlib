@@ -54,7 +54,7 @@ TEST(TestDmScanLib, getFlatbedDimensions) {
    EXPECT_GT(dimensions.first, 0);
    EXPECT_GT(dimensions.second, 0);
 
-   VLOG(2) << "flatbed dimensions: " << dimensions.first << ", " << dimensions.second;
+   VLOG(3) << "flatbed dimensions: " << dimensions.first << ", " << dimensions.second;
 }
 
 TEST(TestDmScanLib, scanImage) {

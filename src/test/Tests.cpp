@@ -22,11 +22,11 @@
 
 int main(int argc, char **argv) {
    ::testing::InitGoogleTest(&argc, argv);
+   dmscanlib::DmScanLib::configLogging(0, false);
 
    dmscanlib::test::getFirstDevice();
 
    dmscanlib::test::initializeTwain();
-   dmscanlib::DmScanLib::configLogging(1, false);
    int result = RUN_ALL_TESTS();
 
    // uncomment next line to wait for user to press enter key

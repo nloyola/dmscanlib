@@ -53,7 +53,7 @@ TEST(TestImgScanner, acquireFlatbed) {
 	   << "no image returned: error: "
 	   << imgScanner->getErrorCode();
 
-   VLOG(2) << "image width: " << image->getWidth() << ", height: " << image->getHeight();
+   VLOG(1) << "image width: " << image->getWidth() << ", height: " << image->getHeight();
 
    int expectedWidth = static_cast<int>(static_cast<float>(dpi * flatbedDimensions.first));
    int expectedHeight = static_cast<int>(static_cast<float>(dpi * flatbedDimensions.second));
