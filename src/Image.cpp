@@ -7,7 +7,7 @@
 
 #include "Image.h"
 
-#include <opencv/highgui.h>
+#include <opencv2/opencv.hpp>
 
 #define GLOG_NO_ABBREVIATED_SEVERITIES
 #include <glog/logging.h>
@@ -68,7 +68,7 @@ Image::Image(HANDLE handle) : filename("") {
 
 	unsigned rowBytes = static_cast<unsigned>(
 		ceil((dibHeaderPtr->biWidth * dibHeaderPtr->biBitCount) / 32.0)) << 2;
-		
+
 	unsigned paletteSize;
     switch (dibHeaderPtr->biBitCount) {
     case 1:
@@ -89,13 +89,13 @@ Image::Image(HANDLE handle) : filename("") {
 
 	int channels = 3; // RGB
 	IplImage* cv_image = cvCreateImageHeader(
-		cvSize(dibHeaderPtr->biWidth, dibHeaderPtr->biHeight), 
-		IPL_DEPTH_8U, 
+		cvSize(dibHeaderPtr->biWidth, dibHeaderPtr->biHeight),
+		IPL_DEPTH_8U,
 		channels);
 	if (!cv_image) {
 		throw std::logic_error("invalid image type");
 	}
-	
+
 	cvSetData(cv_image, pixels, cv_image->widthStep);
 	cv::flip(cv::Mat(cv_image), image, 0);
 
