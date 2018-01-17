@@ -20,6 +20,7 @@
 #include "imgscanner/SaneOption.h"
 
 #include <sane/sane.h>
+#include <map>
 #include <vector>
 #include <utility>
 #include <memory>

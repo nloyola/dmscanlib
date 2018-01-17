@@ -52,7 +52,7 @@ OBJS := $(addprefix $(BUILD_DIR)/, $(FILES:.cpp=.o))
 INCLUDE_PATH := $(foreach inc,$(PATHS),$(inc)) third_party/libdmtx third_party/glog/src \
 	$(JAVA_HOME)/include $(JAVA_HOME)/include/linux
 
-LIBS := -lglog -ldmtx -lOpenThreads -lopencv_core -lopencv_highgui -lopencv_imgproc -lsane
+LIBS := -lglog -ldmtx -lOpenThreads -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lsane
 TEST_LIBS := -lgtest -lconfig++ -lpthread
 LIB_PATH :=
 
@@ -91,7 +91,7 @@ VPATH := $(CURDIR) $(INCLUDE_PATH)
 
 CFLAGS += -c $(foreach inc,$(INCLUDE_PATH),-I$(inc))
 CXXFLAGS := -pedantic -Wall -Wno-long-long -Wno-variadic-macros -Wno-deprecated \
-	$(CFLAGS)
+	$(CFLAGS) -std=c++11
 LDFLAGS += $(foreach path,$(LIB_PATH),-L$(path))
 CFLAGS += -Wno-write-strings -fpermissive
 

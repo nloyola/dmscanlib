@@ -28,6 +28,7 @@
 #include <glog/logging.h>
 #include <math.h>
 #include <opencv/highgui.h>
+#include <opencv2/imgproc/imgproc.hpp>
 
 namespace dmscanlib {
 

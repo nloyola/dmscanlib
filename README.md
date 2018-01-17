@@ -34,14 +34,12 @@ You need Eclipse CDT. The following projects are configured for Eclipse:
 
 ## Running on Ubuntu (or Linux)
 
-  - `libdmtx-dev`
-  - `libopenthreads-dev`
-  - `libgoogle-glog-dev`
-  - `libgtest-dev`
-  - `libgflags-dev`
-  - `libopencv-dev`
-  - `libconfig++-dev`
-  - `libsane-dev`
+Install the following packages:
+
+``` bash
+sudo apt-get install libdmtx-dev libopenthreads-dev libgoogle-glog-dev libgtest-dev libgflags-dev \
+                     libopencv-dev libconfig++-dev libsane-dev libgtest-dev
+```
 
 ## JNI
 
