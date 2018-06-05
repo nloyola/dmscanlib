@@ -18,3 +18,5 @@ dmscanlib.sdf
 dmscanlib.v11.suo
 dmscanlib.vcxproj.filters
 dmscanlib.vcxproj.user
+*.pnm
+*.png

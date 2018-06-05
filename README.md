@@ -39,6 +39,7 @@ You need Eclipse CDT. The following projects are configured for Eclipse:
   - `libgflags-dev`
   - `libopencv-dev`
   - `libconfig++-dev`
+  - `libsane-dev`
 
 ## JNI
 
