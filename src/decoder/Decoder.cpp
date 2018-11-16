@@ -86,6 +86,8 @@ Decoder::~Decoder() {
 }
 
 int Decoder::decodeWellRects() {
+    int result;
+
    VLOG(3) << "decodeWellRects: numWellRects/" << wellRects.size();
 
    for (unsigned i = 0, n = wellRects.size(); i < n; ++i) {
@@ -106,24 +108,30 @@ int Decoder::decodeWellRects() {
       wellDecoders[i] = std::unique_ptr<WellDecoder>(
          new WellDecoder(*this, std::move(convertedWellRect)));
    }
-   return decodeMultiThreaded();
-   //return decodeSingleThreaded();
+
+   result = decodeMultiThreaded();
+   //result = decodeSingleThreaded();
+
+   decodeSuccessful = (result == SC_SUCCESS);
+
+   return result;
 }
 
 int Decoder::decodeSingleThreaded() {
    for (unsigned i = 0, n = wellDecoders.size(); i < n; ++i) {
-      wellDecoders[i]->run();
-      if (!wellDecoders[i]->getMessage().empty()) {
-         decodedWells[wellDecoders[i]->getMessage()] = wellDecoders[i].get();
-      }
+      WellDecoder & wellDecoder = *wellDecoders[i];
+      wellDecoder.run();
    }
-   return SC_SUCCESS;
+   return postProcess();
 }
 
 int Decoder::decodeMultiThreaded() {
    decoder::ThreadMgr threadMgr;
    threadMgr.decodeWells(wellDecoders);
+   return postProcess();
+}
 
+int Decoder::postProcess() {
    for (unsigned i = 0, n = wellDecoders.size(); i < n; ++i) {
       WellDecoder & wellDecoder = *wellDecoders[i];
       VLOG(5) << wellDecoder;
@@ -136,7 +144,6 @@ int Decoder::decodeMultiThreaded() {
          decodedWells[wellDecoder.getMessage()] = &wellDecoder;
       }
    }
-   decodeSuccessful = true;
    return SC_SUCCESS;
 }
 

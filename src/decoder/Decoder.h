@@ -76,6 +76,7 @@ private:
 
     int decodeSingleThreaded();
     int decodeMultiThreaded();
+    int postProcess();
 
     Image grayscaleImage;
     const DecodeOptions & decodeOptions;
