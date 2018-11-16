@@ -125,10 +125,19 @@ test : $(OBJS)
 	$(SILENT) $(CC) $(LDFLAGS) -o $@ $(OBJS) $(LIBS) $(TEST_LIBS)
 
 clean:
-	rm -rf  $(BUILD_DIR)/*.[odP] $(PROJECT)
+	rm -rf  $(BUILD_DIR)/*.[odP] $(PROJECT) *.pnm
 
 doc: doxygen.cfg
 	doxygen $<
+
+help:
+	@echo 'Available targets:'
+	@echo '  all:           Builds the library'
+	@echo '  test:          Builds the test executable'
+	@echo '  clean:         Clean compiled files'
+	@echo '  doc:           Generates documentation from comments'
+	@echo ''
+
 #
 # This rule also creates the dependency files
 #
