@@ -154,9 +154,7 @@ DmtxImage * Image::dmtxImage() const {
       throw std::logic_error("invalid image type: " + image.type());
    }
 
-   DmtxImage * dmtxImage = dmtxImageCreate(
-      image.data, image.cols, image.rows, DmtxPack8bppK);
-   dmtxImageSetProp(dmtxImage, DmtxPropRowPadBytes, image.step1() - image.cols);
+   DmtxImage * dmtxImage = dmtxImageCreate(image.data, image.cols, image.rows, DmtxPack8bppK);
    return dmtxImage;
 }
 
@@ -165,8 +163,10 @@ std::unique_ptr<const Image> Image::crop(unsigned x,
                                          unsigned width,
                                          unsigned height) const {
    cv::Rect roi(x, y, width, height);
-   cv::Mat croppedImage = image(roi);
-   return std::unique_ptr<Image>(new Image(croppedImage));
+    cv::Mat croppedRef(image, roi);
+    cv::Mat cropped;
+    croppedRef.copyTo(cropped);
+    return std::unique_ptr<Image>(new Image(cropped));
 }
 
 void Image::drawRectangle(const cv::Rect & rect, const cv::Scalar & color) {
