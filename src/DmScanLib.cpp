@@ -38,7 +38,7 @@ namespace dmscanlib {
 
 const std::string DmScanLib::LIBRARY_NAME("dmscanlib");
 
-bool DmScanLib::loggingInitialized = false;
+bool DmScanLib::isLoggingInitialized = false;
 
 DmScanLib::DmScanLib() :
       imgScanner(std::move(ImgScanner::create()))
@@ -76,9 +76,9 @@ void DmScanLib::getFlatbedDimensions(std::pair<float, float> & dimensions) {
 }
 
 void DmScanLib::configLogging(unsigned level, bool useFile) {
-   if (!loggingInitialized) {
+   if (!isLoggingInitialized) {
       google::InitGoogleLogging(LIBRARY_NAME.c_str());
-      loggingInitialized = true;
+      isLoggingInitialized = true;
    }
 
    FLAGS_v = level;

@@ -57,89 +57,89 @@ enum PalletSize { PSIZE_8x12, PSIZE_10x10, PSIZE_12x12, PSIZE_9x9, PSIZE_1x1, PS
 
 class DmScanLib {
 public:
-   DmScanLib();
-   virtual ~DmScanLib();
+    DmScanLib();
+    virtual ~DmScanLib();
 
-   int selectSourceAsDefault();
+    int selectSourceAsDefault();
 
-   void getDeviceNames(std::vector<std::string> & names);
+    void getDeviceNames(std::vector<std::string> & names);
 
-   void selectDevice(const char * const deviceName);
+    void selectDevice(const char * const deviceName);
 
-   int getScannerCapability();
+    int getScannerCapability();
 
-   void getValidDpis(std::vector<int> & validDpis);
+    void getValidDpis(std::vector<int> & validDpis);
 
-   void getFlatbedDimensions(std::pair<float, float> & dimensions);
+    void getFlatbedDimensions(std::pair<float, float> & dimensions);
 
-   int scanImage(const char * const deviceName,
-                 unsigned dpi,
-                 int brightness,
-                 int contrast,
-                 float left,
-                 float top,
-                 float right,
-                 float bottom,
-                 const char * const filename);
+    int scanImage(const char * const deviceName,
+                  unsigned dpi,
+                  int brightness,
+                  int contrast,
+                  float left,
+                  float top,
+                  float right,
+                  float bottom,
+                  const char * const filename);
 
-   int scanFlatbed(const char * const deviceName,
-                   unsigned dpi,
-                   int brightness,
-                   int contrast,
-                   const char * const filename);
+    int scanFlatbed(const char * const deviceName,
+                    unsigned dpi,
+                    int brightness,
+                    int contrast,
+                    const char * const filename);
 
-   int scanAndDecode(const char * const deviceName,
-                     unsigned dpi,
-                     int brightness,
-                     int contrast,
-                     float left,
-                     float top,
-                     float right,
-                     float bottom,
-                     const DecodeOptions & decodeOptions,
-                     std::vector<std::unique_ptr<const WellRectangle> > & wellRects);
+    int scanAndDecode(const char * const deviceName,
+                      unsigned dpi,
+                      int brightness,
+                      int contrast,
+                      float left,
+                      float top,
+                      float right,
+                      float bottom,
+                      const DecodeOptions & decodeOptions,
+                      std::vector<std::unique_ptr<const WellRectangle> > & wellRects);
 
-   int decodeImageWells(char const * const filename,
-                        DecodeOptions const & decodeOptions,
-                        std::vector<std::unique_ptr<const WellRectangle> > & wellRects);
+    int decodeImageWells(char const * const filename,
+                         DecodeOptions const & decodeOptions,
+                         std::vector<std::unique_ptr<const WellRectangle> > & wellRects);
 
-   static void configLogging(unsigned level, bool useFile = true);
+    static void configLogging(unsigned level, bool useFile = true);
 
-   const unsigned getDecodedWellCount();
+    const unsigned getDecodedWellCount();
 
-   const std::map<std::string, const WellDecoder *> & getDecodedWells() const;
+    const std::map<std::string, const WellDecoder *> & getDecodedWells() const;
 
 
-   static Orientation getOrientationFromString(std::string & orientationStr);
+    static Orientation getOrientationFromString(std::string & orientationStr);
 
-   static BarcodePosition getBarcodePositionFromString(std::string & positionStr);
+    static BarcodePosition getBarcodePositionFromString(std::string & positionStr);
 
-   static std::string sbsLabelingFromRowCol(unsigned row, unsigned col);
+    static std::string sbsLabelingFromRowCol(unsigned row, unsigned col);
 
-   static std::string getLabelForPosition(unsigned row,
-                                          unsigned col,
-                                          unsigned rowsMax,
-                                          unsigned colsMax,
-                                          Orientation orientation,
-                                          BarcodePosition barcodePosition);
+    static std::string getLabelForPosition(unsigned row,
+                                           unsigned col,
+                                           unsigned rowsMax,
+                                           unsigned colsMax,
+                                           Orientation orientation,
+                                           BarcodePosition barcodePosition);
 
-   static PalletSize getPalletSizeFromString(std::string & palletSizeStr);
+    static PalletSize getPalletSizeFromString(std::string & palletSizeStr);
 
 protected:
-   int decodeCommon(const Image & image,
-                    const DecodeOptions & decodeOptions,
-                    const std::string & decodedDibFilename,
-                    std::vector<std::unique_ptr<const WellRectangle> > & wellRects);
+    int decodeCommon(const Image & image,
+                     const DecodeOptions & decodeOptions,
+                     const std::string & decodedDibFilename,
+                     std::vector<std::unique_ptr<const WellRectangle> > & wellRects);
 
-   void writeDecodedImage(const Image & image, const std::string & decodedDibFilename);
+    void writeDecodedImage(const Image & image, const std::string & decodedDibFilename);
 
-   static const std::string LIBRARY_NAME;
+    static const std::string LIBRARY_NAME;
 
-   std::unique_ptr<ImgScanner> imgScanner;
+    std::unique_ptr<ImgScanner> imgScanner;
 
-   std::unique_ptr<Decoder> decoder;
+    std::unique_ptr<Decoder> decoder;
 
-   static bool loggingInitialized;
+    static bool isLoggingInitialized;
 
 };
 

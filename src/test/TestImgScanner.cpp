@@ -33,7 +33,6 @@ std::unique_ptr<ImgScanner> selectSourceAsDefault() {
 }
 
 TEST(TestImgScanner, getCapability) {
-   FLAGS_v = 5;
    std::unique_ptr<ImgScanner> imgScanner = selectSourceAsDefault();
    EXPECT_NE(imgScanner->getScannerCapability(), 0);
 }
@@ -41,7 +40,6 @@ TEST(TestImgScanner, getCapability) {
 TEST(TestImgScanner, acquireFlatbed) {
    unsigned dpi = 75;
 
-   FLAGS_v = 0;
    std::unique_ptr<ImgScanner> imgScanner = selectSourceAsDefault();
 
    std::pair<float, float> flatbedDimensions;
@@ -70,8 +68,6 @@ TEST(TestImgScanner, acquireImage) {
    float right = 3.0;
    float bottom = 2.0;
 
-   FLAGS_v = 0;
-
    std::unique_ptr<ImgScanner> imgScanner = selectSourceAsDefault();
    std::unique_ptr<Image> image =
       imgScanner->acquireImage(dpi, 0, 0, left, top, right, bottom);
@@ -95,7 +91,6 @@ TEST(TestImgScanner, acquireImageBadBrightness) {
    float right = 3.0;
    float bottom = 2.0;
 
-   FLAGS_v = 3;
    std::pair<int, int> brightnessRange;
    std::unique_ptr<ImgScanner> imgScanner = selectSourceAsDefault();
 
@@ -116,7 +111,6 @@ TEST(TestImgScanner, acquireImageBadContrast) {
    float right = 3.0;
    float bottom = 2.0;
 
-   FLAGS_v = 0;
    std::pair<int, int> contrastRange;
    std::unique_ptr<ImgScanner> imgScanner = selectSourceAsDefault();
 
@@ -132,7 +126,6 @@ TEST(TestImgScanner, acquireImageBadContrast) {
 }
 
 TEST(TestImgScanner, acquireImageBadRegion) {
-   FLAGS_v = 3;
    std::pair<float, float> flatbedDimensions;
    std::unique_ptr<ImgScanner> imgScanner = selectSourceAsDefault();
 

@@ -28,7 +28,6 @@ std::unique_ptr<imgscanner::ImgScannerSane> selectFirstDevice() {
 }
 
 TEST(TestImgScannerLinux, selectDevice) {
-   FLAGS_v = 3;
    std::vector<std::string> deviceNames;
 
    imgscanner::ImgScannerSane imgScanner;
@@ -42,7 +41,6 @@ TEST(TestImgScannerLinux, selectDevice) {
 }
 
 TEST(TestImgScannerLinux, getCapabilityBadDeviceName) {
-   FLAGS_v = 3;
    imgscanner::ImgScannerSane imgScanner;
    imgScanner.selectDevice("badDeviceName");
    EXPECT_DEATH(imgScanner.getScannerCapability(),
@@ -50,13 +48,11 @@ TEST(TestImgScannerLinux, getCapabilityBadDeviceName) {
 }
 
 TEST(TestImgScannerLinux, getCapabilityNoDeviceSelected) {
-   FLAGS_v = 3;
    imgscanner::ImgScannerSane imgScanner;
    EXPECT_DEATH(imgScanner.getScannerCapability(), "no device selected");
 }
 
 TEST(TestImgScannerLinux, acquireImageNoDeviceSelected) {
-   FLAGS_v = 3;
    cv::Rect_<float> rect(0, 0, 1, 1);
    imgscanner::ImgScannerSane imgScanner;
    EXPECT_DEATH(imgScanner.acquireImage(100, 0, 0, rect.x, rect.y, rect.width, rect.height),
@@ -64,13 +60,11 @@ TEST(TestImgScannerLinux, acquireImageNoDeviceSelected) {
 }
 
 TEST(TestImgScannerLinux, acquireFlatbedNoDeviceSelected) {
-   FLAGS_v = 3;
    imgscanner::ImgScannerSane imgScanner;
    EXPECT_DEATH(imgScanner.acquireFlatbed(100, 0, 0), "no device selected");
 }
 
 TEST(TestImgScannerLinux, getFlatbedDimensionsInInchesNoDeviceSelected) {
-   FLAGS_v = 3;
    imgscanner::ImgScannerSane imgScanner;
    std::pair<float, float> pair;
    EXPECT_DEATH(imgScanner.getFlatbedDimensionsInInches(pair), "no device selected");

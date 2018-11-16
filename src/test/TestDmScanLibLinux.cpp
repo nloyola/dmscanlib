@@ -110,8 +110,6 @@ void writeAllDecodeResults(std::vector<std::string> & testResults, bool append =
 }
 
 TEST(TestDmScanLibLinux, readInfoFiles) {
-   FLAGS_v = 1;
-
    std::string dirname("testImageInfo");
    std::vector<std::string> filenames;
    bool result = test::getTestImageInfoFilenames(dirname, filenames);
@@ -133,8 +131,6 @@ TEST(TestDmScanLibLinux, readInfoFiles) {
 }
 
 TEST(TestDmScanLibLinux, decodeFromInfo) {
-   FLAGS_v = 1;
-
    //std::string infoFilename("testImageInfo/8x12/calgary2.nfo");
    //std::string infoFilename("testImageInfo/8x12/new_tubes.nfo");
    //std::string infoFilename("testImageInfo/9x9/stanford_9x9_1.nfo");
@@ -170,8 +166,6 @@ TEST(TestDmScanLibLinux, decodeFromInfo) {
 
 //TEST(TestDmScanLib, DISABLED_decodeAllImages) {
 TEST(TestDmScanLibLinux, decodeAllImages) {
-   FLAGS_v = 1;
-
    std::string dirname("testImageInfo");
    std::vector<std::string> filenames;
    bool result = test::getTestImageInfoFilenames(dirname, filenames);
@@ -242,8 +236,6 @@ TEST(TestDmScanLibLinux, decodeAllImages) {
 
 TEST(TestDmScanLibLinux, DISABLED_decodeAllImagesAllParameters) {
 //TEST(TestDmScanLib, decodeAllImagesAllParameters) {
-   FLAGS_v = 1;
-
    std::string dirname("testImageInfo");
    std::vector<std::string> filenames;
    bool result = test::getTestImageInfoFilenames(dirname, filenames);

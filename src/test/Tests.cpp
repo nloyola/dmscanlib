@@ -19,18 +19,32 @@
 #include "test/TestCommon.h"
 
 #include <gtest/gtest.h>
+#include <getopt.h>
+
+int getLogLevelFromCommandLine() {
+    int logLevel = 0;
+    std::string verbosePrefix("--v=");
+
+    std::vector<std::string> args = ::testing::internal::GetInjectableArgvs();
+    for(std::vector<std::string>::iterator it = args.begin(); it != args.end(); ++it) {
+        if (!it->compare(0, verbosePrefix.size(), verbosePrefix)) {
+            logLevel = atoi(it->substr(verbosePrefix.size()).c_str());
+        }
+    }
+
+    return logLevel;
+}
 
 int main(int argc, char **argv) {
-   ::testing::InitGoogleTest(&argc, argv);
-   dmscanlib::DmScanLib::configLogging(0, false);
+    ::testing::InitGoogleTest(&argc, argv);
+    dmscanlib::DmScanLib::configLogging(getLogLevelFromCommandLine(), false);
 
-   dmscanlib::test::getFirstDevice();
+    dmscanlib::test::getFirstDevice();
+    dmscanlib::test::initializeTwain();
+    int result = RUN_ALL_TESTS();
 
-   dmscanlib::test::initializeTwain();
-   int result = RUN_ALL_TESTS();
+    // uncomment next line to wait for user to press enter key
+    //std::getchar();
 
-   // uncomment next line to wait for user to press enter key
-   //std::getchar();
-
-   return result;
+    return result;
 }
