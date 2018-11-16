@@ -43,11 +43,13 @@ WellDecoder::~WellDecoder() {
  * This method runs in its own thread.
  */
 void WellDecoder::run() {
-    wellImage = decoder.getWorkingImage().crop(
-            rectangle.x,
-            rectangle.y,
-            rectangle.width,
-            rectangle.height);
+    wellImage = decoder.getWorkingImage().crop(rectangle.x,
+                                               rectangle.y,
+                                               rectangle.width,
+                                               rectangle.height);
+
+    //wellImage->write("well_" + getLabel() + ".png");
+
     decoder.decodeWellRect(*wellImage, *this);
     if (!message.empty()) {
         VLOG(3) << "run: " << *this;
@@ -61,7 +63,7 @@ void WellDecoder::setMessage(const char * message, int messageLength) {
 }
 
 
-const cv::Rect WellDecoder::getWellRectangle() const {	
+const cv::Rect WellDecoder::getWellRectangle() const {
     CHECK_NOTNULL(wellRectangle.get());
 	VLOG(9) << "getWellRectangle: bbox: " << wellRectangle->getRectangle();
 
