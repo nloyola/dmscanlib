@@ -69,7 +69,12 @@ std::string & getFirstDevice() {
       std::unique_ptr<ImgScanner> imgScanner = ImgScanner::create();
       std::vector<std::string> deviceNames;
       imgScanner->getDeviceNames(deviceNames);
-      CHECK_GT(deviceNames.size(), 0);
+
+      if (deviceNames.size() <= 0) {
+          VLOG(1) << "WARNING: no scanning devices found";
+          return firstDeviceName;
+      }
+
       imgScanner->selectDevice(deviceNames[0]);
       firstDeviceName.append(deviceNames[0]);
    }
@@ -238,7 +243,7 @@ std::unique_ptr<DecodeOptions> getDefaultDecodeOptions() {
     const double scanGapFactor = 0.1;
     const long squareDev = 10;
     const long edgeThresh = 5;
-    const long corrections = 10;
+    const long corrections = 0;
     const long shrink = 1;
 
     return std::unique_ptr<DecodeOptions>(new DecodeOptions(
