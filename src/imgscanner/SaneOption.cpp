@@ -79,9 +79,10 @@ std::string SaneOption::valueAsString(SANE_Handle saneHandle) const {
             SANE_UNFIX(SaneUtil::getControlOptionWord(saneHandle, optionNumber)));
 
       case SANE_TYPE_STRING: {
-         SANE_Char value [size];
+         SANE_Char *value = new SANE_Char[size];
          SaneUtil::getControlOptionString(saneHandle, optionNumber, value);
          result.append(value);
+         delete [] value;
          break;
       }
 

@@ -131,12 +131,12 @@ TEST(TestDmScanLibLinux, readInfoFiles) {
 }
 
 TEST(TestDmScanLibLinux, decodeFromInfo) {
-   //std::string infoFilename("testImageInfo/8x12/calgary2.nfo");
+    //std::string infoFilename("testImageInfo/8x12/calgary2.nfo");
    //std::string infoFilename("testImageInfo/8x12/new_tubes.nfo");
    //std::string infoFilename("testImageInfo/9x9/stanford_9x9_1.nfo");
    //std::string infoFilename("testImageInfo/8x12/FrozenPalletImages/HP_L1985A/scanned1_1.nfo");
-   //std::string infoFilename("testImageInfo/8x12/problem_tubes_portrait.nfo");
-   std::string infoFilename("testImageInfo/8x12/edge_tubes.nfo");
+   std::string infoFilename("testImageInfo/8x12/problem_tubes_portrait.nfo");
+   //std::string infoFilename("testImageInfo/8x12/edge_tubes.nfo");
 
    std::unique_ptr<DecodeOptions> defaultDecodeOptions = test::getDefaultDecodeOptions();
    DecodeOptions decodeOptions(0.2,

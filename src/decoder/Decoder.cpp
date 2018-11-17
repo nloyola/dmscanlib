@@ -86,8 +86,6 @@ Decoder::~Decoder() {
 }
 
 int Decoder::decodeWellRects() {
-    int result;
-
    VLOG(3) << "decodeWellRects: numWellRects/" << wellRects.size();
 
    for (unsigned i = 0, n = wellRects.size(); i < n; ++i) {
@@ -109,11 +107,10 @@ int Decoder::decodeWellRects() {
          new WellDecoder(*this, std::move(convertedWellRect)));
    }
 
-   result = decodeMultiThreaded();
-   //result = decodeSingleThreaded();
+   int result = decodeMultiThreaded();
+   //int result = decodeSingleThreaded();
 
    decodeSuccessful = (result == SC_SUCCESS);
-
    return result;
 }
 

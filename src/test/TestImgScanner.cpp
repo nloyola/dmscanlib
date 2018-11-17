@@ -20,8 +20,6 @@ using namespace dmscanlib;
 
 namespace {
 
-int IMAGE_PIXELS_THRESHOLD = 5;
-
 std::unique_ptr<ImgScanner> selectSourceAsDefault() {
    std::unique_ptr<ImgScanner> imgScanner = ImgScanner::create();
 

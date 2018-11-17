@@ -31,6 +31,9 @@ SRCS := \
 	src/utils/DmTimeLinux.cpp \
 	src/Image.cpp
 
+# Uncomment DMTX_SRCS to compile with the version of libdmtx in third_party/lbdmtx
+#DMTX_SRCS := third_party/libdmtx/dmtx.c
+
 TEST_SRCS := \
 	src/test/TestWellRectangle.cpp \
 	src/test/ImageInfo.cpp \
@@ -41,28 +44,37 @@ TEST_SRCS := \
 	src/test/TestImgScannerLinux.cpp \
 	src/test/TestCommon.cpp
 
+ifdef DMTX_SRCS
+	SRCS += $(DMTX_SRCS)
+endif
+
 ifeq ($(MAKECMDGOALS),test)
-SRCS += $(TEST_SRCS)
+	SRCS += $(TEST_SRCS)
 endif
 
 FILES = $(notdir $(SRCS))
+
 PATHS = $(sort $(dir $(SRCS) ) )
-OBJS := $(addprefix $(BUILD_DIR)/, $(FILES:.cpp=.o))
+OBJS := $(addprefix $(BUILD_DIR)/, $(addsuffix .o, $(basename $(FILES))))
 
-INCLUDE_PATH := $(foreach inc,$(PATHS),$(inc)) third_party/libdmtx third_party/glog/src \
-	$(JAVA_HOME)/include $(JAVA_HOME)/include/linux
+INCLUDE_PATH := $(foreach inc,$(PATHS),$(inc)) $(JAVA_HOME)/include $(JAVA_HOME)/include/linux
 
-LIBS := -lglog -ldmtx -lOpenThreads -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lsane
+LIBS := -lglog -lOpenThreads -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lsane
+
+ifndef DMTX_SRCS
+	LIBS := -ldmtx $(LIBS)
+endif
+
 TEST_LIBS := -lgtest -lconfig++ -lpthread
 LIB_PATH :=
 
 CC := g++
 CXX := $(CC)
-CFLAGS := -fmessage-length=0 -fPIC -std=gnu++0x
+CFLAGS := -fmessage-length=0 -fPIC
 SED := /bin/sed
 
 ifneq ($(MAKECMDGOALS),test)
-CFLAGS += -O3
+	CFLAGS += -O3
 endif
 
 ifeq ($(OSTYPE),mingw32)
@@ -91,9 +103,9 @@ VPATH := $(CURDIR) $(INCLUDE_PATH)
 
 CFLAGS += -c $(foreach inc,$(INCLUDE_PATH),-I$(inc))
 CXXFLAGS := -pedantic -Wall -Wno-long-long -Wno-variadic-macros -Wno-deprecated \
-	$(CFLAGS) -std=c++11
+	$(CFLAGS) -std=c++11 -fpermissive -std=gnu++0x
 LDFLAGS += $(foreach path,$(LIB_PATH),-L$(path))
-CFLAGS += -Wno-write-strings -fpermissive
+CFLAGS += -Wno-write-strings
 
 ifeq ($(HOST),windows)
 	CFLAGS += -D'srand48(n)=srand ((n))' -D'drand48()=((double)rand()/RAND_MAX)'
@@ -143,7 +155,15 @@ help:
 #
 $(BUILD_DIR)/%.o : %.cpp
 	@echo "compiling $<..."
-	$(SILENT)$(CXX) $(CFLAGS) -MD -o $@ $<
+	$(SILENT)$(CXX) $(CXXFLAGS) -MD -o $@ $<
+	$(SILENT)cp $(BUILD_DIR)/$*.d $(BUILD_DIR)/$*.P; \
+	$(SED) -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
+		-e '/^$$/ d' -e 's/$$/ :/' < $(BUILD_DIR)/$*.d >> $(BUILD_DIR)/$*.P; \
+	rm -f $(BUILD_DIR)/$*.d
+#
+$(BUILD_DIR)/%.o : %.c
+	@echo "compiling $<..."
+	$(SILENT) gcc $(CFLAGS) -MD -o $@ $<
 	$(SILENT)cp $(BUILD_DIR)/$*.d $(BUILD_DIR)/$*.P; \
 	$(SED) -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
 		-e '/^$$/ d' -e 's/$$/ :/' < $(BUILD_DIR)/$*.d >> $(BUILD_DIR)/$*.P; \

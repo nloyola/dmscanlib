@@ -71,10 +71,10 @@ public:
     int getHeight() const;
 
 private:
+    const std::string filename;
     cv::Mat image;
     HANDLE handle;
     bool valid;
-    const std::string filename;
 };
 
 } /* namespace */
