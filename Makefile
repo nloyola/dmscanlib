@@ -57,7 +57,7 @@ FILES = $(notdir $(SRCS))
 PATHS = $(sort $(dir $(SRCS) ) )
 OBJS := $(addprefix $(BUILD_DIR)/, $(addsuffix .o, $(basename $(FILES))))
 
-INCLUDE_PATH := $(foreach inc,$(PATHS),$(inc)) $(JAVA_HOME)/include $(JAVA_HOME)/include/linux
+INCLUDE_PATH := $(foreach inc,$(PATHS),$(inc)) $(JAVA_HOME)/include $(JAVA_HOME)/include/linux /usr/include/opencv4
 
 LIBS := -lglog -lOpenThreads -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lsane
 

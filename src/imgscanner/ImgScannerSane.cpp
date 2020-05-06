@@ -27,7 +27,7 @@
 
 #include <glog/logging.h>
 #include <math.h>
-#include <opencv/highgui.h>
+#include <opencv2/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
 namespace dmscanlib {
@@ -392,7 +392,7 @@ std::unique_ptr<Image> ImgScannerSane::acquireImageInternal(unsigned dpi,
     sane_cancel(saneHandle);
     SaneUtil::closeDevice(saneHandle);
 
-    cv::cvtColor(imageMat, imageMat, CV_RGB2BGR); // OpenCV default is BGR
+    cv::cvtColor(imageMat, imageMat, cv::COLOR_RGB2BGR); // OpenCV default is BGR
     return std::unique_ptr<Image>(new Image(imageMat));
 }
 

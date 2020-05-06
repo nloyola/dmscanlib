@@ -16,7 +16,7 @@
  */
 
 #include <memory>
-#include <opencv/cv.h>
+#include <opencv2/opencv.hpp>
 
 #if defined (WIN32) && ! defined(__MINGW32__)
 #   define NOMINMAX

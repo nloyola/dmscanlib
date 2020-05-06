@@ -31,7 +31,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <sstream>
-#include <opencv/cv.h>
+#include <opencv2/opencv.hpp>
 
 #if defined(USE_NVWA)
 #   include "debug_new.h"

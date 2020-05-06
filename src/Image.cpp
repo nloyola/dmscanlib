@@ -8,6 +8,7 @@
 #include "Image.h"
 
 #include <opencv2/opencv.hpp>
+#include <opencv2/core/types_c.h>
 
 #define GLOG_NO_ABBREVIATED_SEVERITIES
 #include <glog/logging.h>
@@ -128,7 +129,7 @@ int Image::getHeight() const {
 }
 
 void Image::grayscale(Image & that) const {
-   cv::cvtColor(image, that.image, CV_BGR2GRAY);
+    cv::cvtColor(image, that.image, cv::COLOR_BGR2GRAY);
 }
 
 // from: https://github.com/radeonwu/DMTag/blob/master/dm_localization/src/dm_localize.cpp
@@ -179,8 +180,7 @@ void Image::drawLine(const cv::Point & pt1, const cv::Point & pt2, const cv::Sca
 
 int Image::write(const std::string & filename) const {
    VLOG(3) << "write: " << filename;
-   IplImage saveImage = image;
-   int result = cvSaveImage(filename.c_str(), &saveImage);
+   int result = imwrite(filename.c_str(), image);
    return result;
 }
 

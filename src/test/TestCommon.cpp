@@ -17,7 +17,7 @@
 #include <sstream>
 
 #include <algorithm>
-#include <opencv/cv.h>
+#include <opencv2/opencv.hpp>
 
 #define GLOG_NO_ABBREVIATED_SEVERITIES
 #include <glog/logging.h>
