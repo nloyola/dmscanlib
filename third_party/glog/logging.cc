@@ -61,6 +61,7 @@
 #include "glog/logging.h"
 #include "glog/raw_logging.h"
 #include "base/googleinit.h"
+#include <algorithm>
 
 #ifdef HAVE_STACKTRACE
 # include "stacktrace.h"
