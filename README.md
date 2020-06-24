@@ -74,5 +74,6 @@ Use `--gtest_filter=*` parameter to run a single test.
   Use the following commands to check for memory leaks:
 
 ```bash
-valgrind --track-origins=yes --tool=memcheck --leak-check=yes -v --show-reachable=yes --num-callers=10 Linux-Debug/dmscanlib --gtest_filter=TestDmScanLib.decodeFromInfo
+make test
+valgrind --track-origins=yes --tool=memcheck --leak-check=yes -v --show-reachable=yes --num-callers=10 test --gtest_filter=TestDmScanLibLinux.decodeFromInfo
 ```
